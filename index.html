@@ -3,90 +3,138 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RSGT Bangladesh — Terminal Assignment Dashboard</title>
+  <title>RSGT Bangladesh — Terminal Delivery Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body { background-color: #f4f6f9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    .header-panel { background: linear-gradient(135deg, #0d3b66, #0056b3); color: white; border-radius: 12px; }
-    .card-section { border-radius: 10px; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px; }
-    .section-title { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #0d3b66; margin-bottom: 15px; border-bottom: 2px solid #e9ecef; padding-bottom: 8px; }
-    .badge-locked { background-color: #6c757d; }
-    .badge-live { background-color: #0d6efd; }
-    .table thead th { background-color: #0d3b66; color: white; font-weight: 600; text-align: center; }
+    body { 
+      background-color: #f4f6f9; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+    }
+    /* Dark Navy Header matching screenshot */
+    .header-panel { 
+      background-color: #002b49; 
+      color: white; 
+      border-radius: 0 0 8px 8px; 
+      padding: 12px 24px;
+    }
+    .section-title { 
+      font-size: 1rem; 
+      font-weight: 700; 
+      letter-spacing: 0.5px; 
+      text-transform: uppercase; 
+      color: #0084c7; /* Sky Blue */
+      margin-bottom: 15px; 
+      border-bottom: 2px solid #e0f2fe; 
+      padding-bottom: 8px; 
+    }
+    .badge-booked { background-color: #6c757d; }
+    .badge-live { background-color: #0284c7; } /* Sky Blue Badge */
+    
+    .table thead th { 
+      background-color: #0284c7; /* Sky Blue Table Headers */
+      color: white; 
+      font-weight: 600; 
+      text-align: center; 
+    }
     .table td { text-align: center; vertical-align: middle; }
-    .table td.metric-name { text-align: left; font-weight: 600; color: #212529; }
+    .table td.metric-name { text-align: left; font-weight: 600; color: #212529; width: 40%; }
+    
+    /* Time & Location Display Styling */
+    .clock-time {
+      color: #00a8e8; /* Sky Blue */
+      font-weight: 700;
+      font-size: 1.1rem;
+      line-height: 1.1;
+    }
+    .clock-location {
+      color: #ffffff;
+      font-size: 0.75rem;
+      opacity: 0.9;
+    }
+    .last-updated-text {
+      color: #94a3b8;
+      font-size: 0.7rem;
+      margin-top: 2px;
+    }
   </style>
 </head>
 <body>
 
-<div class="container py-3 py-md-4">
-  <!-- Header with Logo -->
-  <div class="p-3 p-md-4 mb-4 header-panel d-flex justify-content-between align-items-center flex-wrap">
+<!-- TOP NAV HEADER -->
+<div class="header-panel mb-4 shadow-sm">
+  <div class="container-fluid d-flex justify-content-between align-items-center flex-wrap">
+    
+    <!-- Logo and Title -->
     <div class="d-flex align-items-center gap-3">
-      <img src="rsgt_bangladesh_logo.jpg" alt="RSGT Logo" style="height: 50px; width: auto; border-radius: 6px; background: white; padding: 2px;" onerror="this.style.display='none'">
+      <img src="rsgt_bangladesh_logo.jpg" alt="RSGT Logo" style="height: 42px; width: auto; border-radius: 4px; background: white; padding: 2px;" onerror="this.style.display='none'">
       <div>
-        <h3 class="fw-bold mb-0">RSGT Bangladesh</h3>
-        <p class="mb-0 opacity-75 small">Terminal Delivery KPI Dashboard</p>
+        <h4 class="fw-bold mb-0 text-white">RSGT Bangladesh</h4>
+        <div class="fw-semibold text-white-50 small">Terminal Delivery Dashboard</div>
       </div>
     </div>
-    <div class="mt-2 mt-sm-0 text-sm-end small opacity-75">
-      <div>Live Yard Update: <span id="latestTime" class="fw-bold">-</span></div>
-      <div>Locked Cutoff (09:00 AM): <span id="lockedTime" class="fw-bold">-</span></div>
-    </div>
-  </div>
 
-  <!-- SECTION 1: TODAY KPIs -->
-  <div class="card card-section p-3 p-md-4 bg-white">
-    <div class="section-title">1. Today's Delivery KPIs</div>
+    <!-- Live Watch and Last Updated Time -->
+    <div class="text-end mt-2 mt-sm-0">
+      <div id="liveClock" class="clock-time">--:--:-- --</div>
+      <div class="clock-location">Chattogram</div>
+      <div id="lastUpdated" class="last-updated-text">- Last updated --/--/----, --:--:-- --</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="container py-2 py-md-3">
+
+  <!-- SECTION 1: TODAY'S ASSIGNMENT -->
+  <div class="card card-section p-3 p-md-4 bg-white mb-4 border-0 shadow-sm rounded-3">
+    <div class="section-title">1. Today's Assignment</div>
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th class="text-start ps-3">KPI Name</th>
-            <th style="width: 35%;">Locked Assignment (09:00 AM)</th>
-            <th style="width: 35%;">Live Yard Data</th>
+            <th class="text-start ps-3"></th>
+            <th style="width: 30%;">Today's Booked</th>
+            <th style="width: 30%;">Live Yard Data</th>
           </tr>
         </thead>
         <tbody id="todayKpiRows">
-          <tr><td colspan="3" class="py-3 text-muted">Loading Today's KPIs...</td></tr>
+          <tr><td colspan="3" class="py-3 text-muted">Loading Today's Assignment...</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- SECTION 2: SPECIAL OCD & REEFER -->
-  <div class="card card-section p-3 p-md-4 bg-white">
-    <div class="section-title">2. Special Equipment & Reefer</div>
+  <!-- SECTION 2: SPECIAL ASSIGNMENT -->
+  <div class="card card-section p-3 p-md-4 bg-white mb-4 border-0 shadow-sm rounded-3">
+    <div class="section-title">2. Special Assignment</div>
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th class="text-start ps-3">KPI Name</th>
-            <th style="width: 35%;">Locked Assignment (09:00 AM)</th>
-            <th style="width: 35%;">Live Yard Data</th>
+            <th class="text-start ps-3"></th>
+            <th style="width: 60%;">Live Yard Data</th>
           </tr>
         </thead>
         <tbody id="specialKpiRows">
-          <tr><td colspan="3" class="py-3 text-muted">Loading Special Equipment KPIs...</td></tr>
+          <tr><td colspan="2" class="py-3 text-muted">Loading Special Assignment...</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- SECTION 3: TOMORROW KPIs -->
-  <div class="card card-section p-3 p-md-4 bg-white">
-    <div class="section-title">3. Tomorrow's Forecast KPIs (CV / OCD / Inspection)</div>
+  <!-- SECTION 3: TOMORROW'S ASSIGNMENT -->
+  <div class="card card-section p-3 p-md-4 bg-white mb-4 border-0 shadow-sm rounded-3">
+    <div class="section-title">3. Tomorrow's Assignment</div>
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th class="text-start ps-3">KPI Name</th>
-            <th style="width: 35%;">Locked Assignment (09:00 AM)</th>
-            <th style="width: 35%;">Live Yard Data</th>
+            <th class="text-start ps-3"></th>
+            <th style="width: 60%;">Live Yard Data</th>
           </tr>
         </thead>
         <tbody id="tomorrowKpiRows">
-          <tr><td colspan="3" class="py-3 text-muted">Loading Tomorrow's KPIs...</td></tr>
+          <tr><td colspan="2" class="py-3 text-muted">Loading Tomorrow's Assignment...</td></tr>
         </tbody>
       </table>
     </div>
@@ -95,44 +143,58 @@
 </div>
 
 <script>
+// Live Watch Clock (Chattogram Time)
+function updateClock() {
+  const now = new Date();
+  document.getElementById('liveClock').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Fetch Data Payload
 async function loadDashboard() {
   try {
     const response = await fetch('data.json?cacheBust=' + new Date().getTime());
     const data = await response.json();
 
-    document.getElementById('latestTime').innerText = data.latestTimestamp ? new Date(data.latestTimestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-';
-    document.getElementById('lockedTime').innerText = data.lockedTimestamp ? new Date(data.lockedTimestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-';
+    // Format timestamp like: - Last updated 10/4/2026, 12:47:48 AM
+    if (data.latestTimestamp) {
+      const dt = new Date(data.latestTimestamp);
+      const formattedDate = `${dt.getMonth() + 1}/${dt.getDate()}/${dt.getFullYear()}`;
+      const formattedTime = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('lastUpdated').innerText = `- Last updated ${formattedDate}, ${formattedTime}`;
+    }
 
-    // Group 1: Today KPIs
+    // Group 1: Today's Assignment
     const todayList = [
-      { label: 'Today CV', key: 'Today_CV' },
-      { label: 'Today OCD', key: 'Today_OCD' },
-      { label: 'Today INS (Inspection)', key: 'Today_INS' }
+      { label: 'CV', key: 'Today_CV' },
+      { label: 'OCD', key: 'Today_OCD' },
+      { label: 'Inspection', key: 'Today_INS' }
     ];
 
-    // Group 2: Special Equipment
+    // Group 2: Special Assignment
     const specialList = [
-      { label: 'Today Special OCD', key: 'Today_Special_OCD' },
-      { label: 'Today Special Reefer', key: 'Today_Special_Reefer' }
+      { label: 'Special OCD', key: 'Today_Special_OCD' },
+      { label: 'Special Reefer', key: 'Today_Special_Reefer' }
     ];
 
-    // Group 3: Tomorrow KPIs
+    // Group 3: Tomorrow's Assignment
     const tomorrowList = [
-      { label: 'Tomorrow CV', key: 'Tomorrow_CV' },
-      { label: 'Tomorrow OCD', key: 'Tomorrow_OCD' },
-      { label: 'Tomorrow INS (Inspection)', key: 'Tomorrow_INS' }
+      { label: 'CV', key: 'Tomorrow_CV' },
+      { label: 'OCD', key: 'Tomorrow_OCD' },
+      { label: 'Inspection', key: 'Tomorrow_INS' }
     ];
 
-    function renderRows(items) {
+    function renderTodayRows(items) {
       let html = '';
       items.forEach(item => {
-        const lockedVal = (data.lockedAssignment && data.lockedAssignment[item.key] !== undefined) ? data.lockedAssignment[item.key] : 0;
+        const bookedVal = (data.lockedAssignment && data.lockedAssignment[item.key] !== undefined) ? data.lockedAssignment[item.key] : 0;
         const liveVal = (data.liveYard && data.liveYard[item.key] !== undefined) ? data.liveYard[item.key] : 0;
 
         html += `
           <tr>
             <td class="metric-name ps-3">${item.label}</td>
-            <td><span class="badge badge-locked fs-6 px-3 py-2">${lockedVal}</span></td>
+            <td><span class="badge badge-booked fs-6 px-3 py-2">${bookedVal}</span></td>
             <td><span class="badge badge-live fs-6 px-3 py-2">${liveVal}</span></td>
           </tr>
         `;
@@ -140,9 +202,24 @@ async function loadDashboard() {
       return html;
     }
 
-    document.getElementById('todayKpiRows').innerHTML = renderRows(todayList);
-    document.getElementById('specialKpiRows').innerHTML = renderRows(specialList);
-    document.getElementById('tomorrowKpiRows').innerHTML = renderRows(tomorrowList);
+    function renderLiveOnlyRows(items) {
+      let html = '';
+      items.forEach(item => {
+        const liveVal = (data.liveYard && data.liveYard[item.key] !== undefined) ? data.liveYard[item.key] : 0;
+
+        html += `
+          <tr>
+            <td class="metric-name ps-3">${item.label}</td>
+            <td><span class="badge badge-live fs-6 px-3 py-2">${liveVal}</span></td>
+          </tr>
+        `;
+      });
+      return html;
+    }
+
+    document.getElementById('todayKpiRows').innerHTML = renderTodayRows(todayList);
+    document.getElementById('specialKpiRows').innerHTML = renderLiveOnlyRows(specialList);
+    document.getElementById('tomorrowKpiRows').innerHTML = renderLiveOnlyRows(tomorrowList);
 
   } catch (err) {
     console.error('Failed to load data.json:', err);
@@ -150,7 +227,7 @@ async function loadDashboard() {
 }
 
 loadDashboard();
-setInterval(loadDashboard, 30000); // Auto-refresh every 30s
+setInterval(loadDashboard, 30000); // Refresh data every 30 seconds
 </script>
 </body>
 </html>
