@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSGT Bangladesh — Terminal Delivery Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .header-panel { background: linear-gradient(135deg, #0d3b66, #0056b3); color: white; border-radius: 12px; }
+    .metric-card { border: none; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .badge-locked { background-color: #6c757d; }
+    .badge-live { background-color: #0d6efd; }
+    .badge-balance { background-color: #198754; }
+    .table thead th { background-color: #0d3b66; color: white; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<div class="container py-3 py-md-4">
+  <!-- Header -->
+  <div class="p-3 p-md-4 mb-3 header-panel d-flex justify-content-between align-items-center flex-wrap">
+    <div>
+      <h3 class="fw-bold mb-1">RSGT Bangladesh</h3>
+      <p class="mb-0 opacity-75 small">Terminal Delivery & Yard Balance Monitor</p>
+    </div>
+    <div class="mt-2 mt-sm-0 text-sm-end small opacity-75">
+      <div>Live Yard: <span id="latestTime" class="fw-bold">-</span></div>
+      <div>Locked (09:00 AM): <span id="lockedTime" class="fw-bold">-</span></div>
+    </div>
+  </div>
+
+  <!-- KPI Overview Cards -->
+  <div class="row g-2 g-md-3 mb-3">
+    <div class="col-6 col-lg-3">
+      <div class="card metric-card p-3 bg-white text-center">
+        <small class="text-muted fw-bold d-block">TODAY CV</small>
+        <div class="fs-4 fw-bold text-dark my-1" id="cardCvAssigned">-</div>
+        <span class="badge badge-balance"><span id="cardCvDelivered">-</span> Delivered</span>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card metric-card p-3 bg-white text-center">
+        <small class="text-muted fw-bold d-block">TODAY OCD</small>
+        <div class="fs-4 fw-bold text-dark my-1" id="cardOcdAssigned">-</div>
+        <span class="badge badge-balance"><span id="cardOcdDelivered">-</span> Delivered</span>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card metric-card p-3 bg-white text-center">
+        <small class="text-muted fw-bold d-block">TODAY INS</small>
+        <div class="fs-4 fw-bold text-dark my-1" id="cardInsAssigned">-</div>
+        <span class="badge badge-balance"><span id="cardInsDelivered">-</span> Delivered</span>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card metric-card p-3 bg-white text-center">
+        <small class="text-muted fw-bold d-block">SPECIAL REEFER</small>
+        <div class="fs-4 fw-bold text-dark my-1" id="cardReeferAssigned">-</div>
+        <span class="badge badge-balance"><span id="cardReeferDelivered">-</span> Delivered</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Data Table -->
+  <div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header bg-white py-3">
+      <h6 class="mb-0 fw-bold text-secondary">All Terminal Delivery KPIs</h6>
+    </div>
+    <div class="card-body p-0 table-responsive">
+      <table class="table table-hover align-middle mb-0 text-center">
+        <thead>
+          <tr>
+            <th class="text-start ps-3">KPI Category</th>
+            <th>Locked Assignment</th>
+            <th>Live Yard</th>
+            <th>Delivered Balance</th>
+          </tr>
+        </thead>
+        <tbody id="kpiRows">
+          <tr><td colspan="4" class="py-4 text-muted">Loading live terminal metrics...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+async function loadTerminalDashboard() {
+  try {
+    const response = await fetch('data.json?cacheBust=' + new Date().getTime());
+    const data = await response.json();
+
+    document.getElementById('latestTime').innerText = new Date(data.latestTimestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    document.getElementById('lockedTime').innerText = new Date(data.lockedTimestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+    // Key Summary Cards
+    document.getElementById('cardCvAssigned').innerText = data.lockedAssignment.Today_CV;
+    document.getElementById('cardCvDelivered').innerText = '+' + data.deliveredBalance.CV;
+
+    document.getElementById('cardOcdAssigned').innerText = data.lockedAssignment.Today_OCD;
+    document.getElementById('cardOcdDelivered').innerText = '+' + data.deliveredBalance.OCD;
+
+    document.getElementById('cardInsAssigned').innerText = data.lockedAssignment.Today_INS;
+    document.getElementById('cardInsDelivered').innerText = '+' + data.deliveredBalance.INS;
+
+    document.getElementById('cardReeferAssigned').innerText = data.lockedAssignment.Today_Special_Reefer;
+    document.getElementById('cardReeferDelivered').innerText = '+' + data.deliveredBalance.Special_Reefer;
+
+    // Mapping for 8 KPIs
+    const kpiList = [
+      { label: 'Today CV', key: 'Today_CV', balKey: 'CV' },
+      { label: 'Tomorrow CV', key: 'Tomorrow_CV', balKey: 'Tomorrow_CV' },
+      { label: 'Today INS', key: 'Today_INS', balKey: 'INS' },
+      { label: 'Tomorrow INS', key: 'Tomorrow_INS', balKey: 'Tomorrow_INS' },
+      { label: 'Today OCD', key: 'Today_OCD', balKey: 'OCD' },
+      { label: 'Tomorrow OCD', key: 'Tomorrow_OCD', balKey: 'Tomorrow_OCD' },
+      { label: 'Today Special OCD', key: 'Today_Special_OCD', balKey: 'Special_OCD' },
+      { label: 'Today Special Reefer', key: 'Today_Special_Reefer', balKey: 'Special_Reefer' }
+    ];
+
+    let rowHtml = '';
+    kpiList.forEach(item => {
+      const lockedVal = data.lockedAssignment[item.key] || 0;
+      const liveVal = data.liveYard[item.key] || 0;
+      const balVal = data.deliveredBalance[item.balKey] || 0;
+
+      rowHtml += `
+        <tr>
+          <td class="text-start ps-3 fw-bold text-dark">${item.label}</td>
+          <td><span class="badge badge-locked fs-6">${lockedVal}</span></td>
+          <td><span class="badge badge-live fs-6">${liveVal}</span></td>
+          <td><span class="badge badge-balance fs-6">+${balVal}</span></td>
+        </tr>
+      `;
+    });
+
+    document.getElementById('kpiRows').innerHTML = rowHtml;
+  } catch (err) {
+    console.error('Failed to update dashboard:', err);
+  }
+}
+
+loadTerminalDashboard();
+setInterval(loadTerminalDashboard, 30000); // Auto-refresh every 30s
+</script>
+</body>
+</html>
