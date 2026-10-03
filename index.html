@@ -9,6 +9,9 @@
     body { 
       background-color: #f4f6f9; 
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
     /* Dark Navy Header matching screenshot */
     .header-panel { 
@@ -39,8 +42,8 @@
     .table td { text-align: center; vertical-align: middle; }
     .table td.metric-name { text-align: left; font-weight: 600; color: #212529; width: 40%; }
     
-    /* Time & Location Display Styling */
-    .clock-time {
+    /* Header Date & Location Display */
+    .header-date {
       color: #00a8e8; /* Sky Blue */
       font-weight: 700;
       font-size: 1.1rem;
@@ -48,13 +51,17 @@
     }
     .clock-location {
       color: #ffffff;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
       opacity: 0.9;
     }
-    .last-updated-text {
-      color: #94a3b8;
-      font-size: 0.7rem;
-      margin-top: 2px;
+
+    /* Subtle Bottom-Right Timestamp Footer */
+    .footer-timestamp {
+      margin-top: auto;
+      padding: 15px 24px;
+      text-align: right;
+      color: #6c757d;
+      font-size: 0.75rem;
     }
   </style>
 </head>
@@ -73,11 +80,10 @@
       </div>
     </div>
 
-    <!-- Live Watch and Last Updated Time -->
+    <!-- Date and Location in Header -->
     <div class="text-end mt-2 mt-sm-0">
-      <div id="liveClock" class="clock-time">--:--:-- --</div>
+      <div id="headerDate" class="header-date">--/--/----</div>
       <div class="clock-location">Chattogram</div>
-      <div id="lastUpdated" class="last-updated-text">- Last updated --/--/----, --:--:-- --</div>
     </div>
 
   </div>
@@ -142,14 +148,19 @@
 
 </div>
 
+<!-- BOTTOM RIGHT LAST UPDATED FOOTER -->
+<div class="footer-timestamp">
+  <span id="lastUpdated">- Last updated --/--/----, --:--:-- --</span>
+</div>
+
 <script>
-// Live Watch Clock (Chattogram Time)
-function updateClock() {
+// Display Today's Date in Top Header
+function setHeaderDate() {
   const now = new Date();
-  document.getElementById('liveClock').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const formattedDate = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
+  document.getElementById('headerDate').innerText = formattedDate;
 }
-setInterval(updateClock, 1000);
-updateClock();
+setHeaderDate();
 
 // Fetch Data Payload
 async function loadDashboard() {
@@ -157,7 +168,7 @@ async function loadDashboard() {
     const response = await fetch('data.json?cacheBust=' + new Date().getTime());
     const data = await response.json();
 
-    // Format timestamp like: - Last updated 10/4/2026, 12:47:48 AM
+    // Format timestamp at bottom: - Last updated 10/4/2026, 12:47:48 AM
     if (data.latestTimestamp) {
       const dt = new Date(data.latestTimestamp);
       const formattedDate = `${dt.getMonth() + 1}/${dt.getDate()}/${dt.getFullYear()}`;
