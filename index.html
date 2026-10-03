@@ -13,22 +13,45 @@
       display: flex;
       flex-direction: column;
     }
-    /* Dark Navy Header matching screenshot */
+    /* Dark Navy Header */
     .header-panel { 
       background-color: #002b49; 
       color: white; 
       border-radius: 0 0 8px 8px; 
-      padding: 12px 24px;
+      padding: 10px 20px;
     }
+    
+    /* Logo Styling — Large & Crop Extra Space */
+    .brand-logo {
+      height: 55px; 
+      width: auto; 
+      border-radius: 4px; 
+      background: white; 
+      padding: 0px; /* Removed white padding around edges */
+      object-fit: contain;
+      display: block;
+    }
+
     .section-title { 
       font-size: 1rem; 
       font-weight: 700; 
       letter-spacing: 0.5px; 
       text-transform: uppercase; 
       color: #0084c7; /* Sky Blue */
-      margin-bottom: 15px; 
+      margin-bottom: 0; 
+    }
+    .section-header-wrapper {
       border-bottom: 2px solid #e0f2fe; 
       padding-bottom: 8px; 
+      margin-bottom: 15px;
+    }
+    .date-badge {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #0084c7;
+      background-color: #e0f2fe;
+      padding: 3px 10px;
+      border-radius: 12px;
     }
     .badge-booked { background-color: #6c757d; }
     .badge-live { background-color: #0284c7; } /* Sky Blue Badge */
@@ -41,19 +64,6 @@
     }
     .table td { text-align: center; vertical-align: middle; }
     .table td.metric-name { text-align: left; font-weight: 600; color: #212529; width: 40%; }
-    
-    /* Header Date & Location Display */
-    .header-date {
-      color: #00a8e8; /* Sky Blue */
-      font-weight: 700;
-      font-size: 1.1rem;
-      line-height: 1.1;
-    }
-    .clock-location {
-      color: #ffffff;
-      font-size: 0.8rem;
-      opacity: 0.9;
-    }
 
     /* Subtle Bottom-Right Timestamp Footer */
     .footer-timestamp {
@@ -70,30 +80,25 @@
 <!-- TOP NAV HEADER -->
 <div class="header-panel mb-4 shadow-sm">
   <div class="container-fluid d-flex justify-content-between align-items-center flex-wrap">
-    
     <!-- Logo and Title -->
     <div class="d-flex align-items-center gap-3">
-      <img src="rsgt_bangladesh_logo.jpg" alt="RSGT Logo" style="height: 42px; width: auto; border-radius: 4px; background: white; padding: 2px;" onerror="this.style.display='none'">
+      <img src="rsgt_bangladesh_logo.jpg" alt="RSGT Logo" class="brand-logo" onerror="this.style.display='none'">
       <div>
         <h4 class="fw-bold mb-0 text-white">RSGT Bangladesh</h4>
         <div class="fw-semibold text-white-50 small">Terminal Delivery Dashboard</div>
       </div>
     </div>
-
-    <!-- Date and Location in Header -->
-    <div class="text-end mt-2 mt-sm-0">
-      <div id="headerDate" class="header-date">--/--/----</div>
-      <div class="clock-location">Chattogram</div>
-    </div>
-
   </div>
 </div>
 
 <div class="container py-2 py-md-3">
 
-  <!-- SECTION 1: TODAY'S ASSIGNMENT -->
+  <!-- SECTION 1: TODAY'S ASSIGNMENT WITH DATE -->
   <div class="card card-section p-3 p-md-4 bg-white mb-4 border-0 shadow-sm rounded-3">
-    <div class="section-title">1. Today's Assignment</div>
+    <div class="d-flex justify-content-between align-items-center section-header-wrapper">
+      <div class="section-title">1. Today's Assignment</div>
+      <div id="sectionDate" class="date-badge">Date: --/--/----</div>
+    </div>
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead>
@@ -112,7 +117,9 @@
 
   <!-- SECTION 2: SPECIAL ASSIGNMENT -->
   <div class="card card-section p-3 p-md-4 bg-white mb-4 border-0 shadow-sm rounded-3">
-    <div class="section-title">2. Special Assignment</div>
+    <div class="section-header-wrapper">
+      <div class="section-title">2. Special Assignment</div>
+    </div>
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead>
@@ -130,7 +137,9 @@
 
   <!-- SECTION 3: TOMORROW'S ASSIGNMENT -->
   <div class="card card-section p-3 p-md-4 bg-white mb-4 border-0 shadow-sm rounded-3">
-    <div class="section-title">3. Tomorrow's Assignment</div>
+    <div class="section-header-wrapper">
+      <div class="section-title">3. Tomorrow's Assignment</div>
+    </div>
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead>
@@ -154,13 +163,13 @@
 </div>
 
 <script>
-// Display Today's Date in Top Header
-function setHeaderDate() {
+// Display Today's Date directly on top of Today's Assignment
+function setSectionDate() {
   const now = new Date();
   const formattedDate = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
-  document.getElementById('headerDate').innerText = formattedDate;
+  document.getElementById('sectionDate').innerText = `Date: ${formattedDate}`;
 }
-setHeaderDate();
+setSectionDate();
 
 // Fetch Data Payload
 async function loadDashboard() {
