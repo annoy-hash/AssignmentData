@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-10-03T18:45:39.963Z",
-  "lockedTimestamp": "2026-10-03T18:45:37.371Z",
-  "latestTimestamp": "2026-10-03T18:45:37.371Z",
+  "updatedAt": "2026-10-03T21:20:53.502Z",
+  "lockedTimestamp": "2026-10-03T21:20:49.857Z",
+  "latestTimestamp": "2026-10-03T21:20:49.857Z",
   "lockedAssignment": {
-    "timestamp": "2026-10-03T18:45:37.371Z",
+    "timestamp": "2026-10-03T21:20:49.857Z",
     "Today_CV": 39,
     "Tomorrow_CV": 1,
     "Today_INS": 12,
@@ -14,7 +14,7 @@
     "Today_Special_Reefer": 0
   },
   "liveYard": {
-    "timestamp": "2026-10-03T18:45:37.371Z",
+    "timestamp": "2026-10-03T21:20:49.857Z",
     "Today_CV": 39,
     "Tomorrow_CV": 1,
     "Today_INS": 12,
