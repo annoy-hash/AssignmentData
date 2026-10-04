@@ -83,7 +83,7 @@
       margin-bottom: 12px;
     }
 
-    /* COMMON BADGE STYLING - HIGH CONTRAST SOLID PILLS */
+    /* BASE PILL STYLING */
     .metric-pill {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       font-size: 1.05rem;
@@ -93,10 +93,26 @@
       display: inline-block;
       min-width: 75px;
       text-align: center;
-      background-color: #ffffff !important;
-      color: #002b49 !important;
-      border: 1px solid #cbd5e1;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    /* COLUMN-SPECIFIC HIGH CONTRAST ACCENTS */
+    .pill-booked {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+      border: 1px solid #94a3b8;
+    }
+
+    .pill-special {
+      background-color: #fef3c7 !important;
+      color: #78350f !important;
+      border: 1px solid #f59e0b;
+    }
+
+    .pill-balance {
+      background-color: #d1fae5 !important;
+      color: #064e3b !important;
+      border: 1px solid #10b981;
     }
 
     /* ----------------------------------------------------
@@ -148,7 +164,7 @@
     }
 
     /* ----------------------------------------------------
-       SECTION 2: TOMORROW'S ASSIGNMENT - RSGT SOLID NAVY BLUE THEME
+       SECTION 2: TOMORROW'S ASSIGNMENT - SOLID NAVY BLUE THEME
        ---------------------------------------------------- */
     .card-tomorrow {
       background-color: #002b49 !important;
@@ -377,9 +393,9 @@ async function loadDashboard() {
         html += `
           <tr>
             <td class="metric-name ps-3">${item.label}</td>
-            <td><span class="metric-pill">${bookedVal}</span></td>
-            <td><span class="metric-pill">${specialVal}</span></td>
-            <td><span class="metric-pill">${liveVal}</span></td>
+            <td><span class="metric-pill pill-booked">${bookedVal}</span></td>
+            <td><span class="metric-pill pill-special">${specialVal}</span></td>
+            <td><span class="metric-pill pill-balance">${liveVal}</span></td>
           </tr>
         `;
       });
@@ -394,7 +410,7 @@ async function loadDashboard() {
         html += `
           <tr>
             <td class="metric-name ps-3">${item.label}</td>
-            <td><span class="metric-pill">${liveVal}</span></td>
+            <td><span class="metric-pill pill-balance">${liveVal}</span></td>
           </tr>
         `;
       });
