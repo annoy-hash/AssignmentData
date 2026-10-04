@@ -87,12 +87,13 @@
     .metric-pill {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       font-size: 1.05rem;
-      font-weight: 700;
+      font-weight: 800;
       padding: 5px 16px;
       border-radius: 8px;
       display: inline-block;
       min-width: 70px;
       text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     /* ----------------------------------------------------
@@ -142,23 +143,23 @@
       white-space: nowrap;
     }
 
+    /* SOLID HIGH-CONTRAST PILLS FOR TODAY */
     .badge-today-booked {
-      background-color: #e2e8f0;
-      color: #475569;
+      background-color: #f1f5f9;
+      color: #0f172a;
       border: 1px solid #cbd5e1;
     }
 
     .badge-today-special {
-      background-color: rgba(255, 255, 255, 0.25);
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      backdrop-filter: blur(4px);
+      background-color: #ffffff;
+      color: #002b49;
+      border: 1px solid #93c5fd;
     }
 
     .badge-today-balance {
-      background-color: rgba(255, 255, 255, 0.18);
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.35);
+      background-color: #f8fafc;
+      color: #0284c7;
+      border: 1px solid #7dd3fc;
     }
 
     /* ----------------------------------------------------
@@ -209,9 +210,9 @@
     }
 
     .badge-tomorrow-live { 
-      background-color: rgba(255, 255, 255, 0.18); 
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.35);
+      background-color: #ffffff; 
+      color: #002b49;
+      border: 1px solid #cbd5e1;
     }
 
     /* FOOTER TIMESTAMP */
@@ -367,19 +368,25 @@ async function loadDashboard() {
       { label: 'CV', key: 'Tomorrow_CV' },
       { label: 'OCD', key: 'Tomorrow_OCD' },
       { label: 'Inspection', key: 'Tomorrow_INS' },
+      { label: 'Reefer', key: 'Tomorrow_Reefer' }
     ];
 
     function renderTodayRows(items) {
       let html = '';
       items.forEach(item => {
         const bKey = item.bookedKey || item.key;
-        const bookedVal = (data.lockedAssignment && data.lockedAssignment[bKey] !== undefined) ? data.lockedAssignment[bKey] : 0;
         
-        const specialVal = (data.liveYard && data.liveYard[item.specialKey] !== undefined) 
-                          ? data.liveYard[item.specialKey] 
-                          : ((data.lockedAssignment && data.lockedAssignment[item.specialKey] !== undefined) ? data.lockedAssignment[item.specialKey] : 0);
+        // Ensure values always default to 0 if null or undefined
+        const bookedVal = (data.lockedAssignment && data.lockedAssignment[bKey] !== undefined && data.lockedAssignment[bKey] !== null) 
+          ? data.lockedAssignment[bKey] : 0;
         
-        const liveVal = (data.liveYard && data.liveYard[item.key] !== undefined) ? data.liveYard[item.key] : 0;
+        const specialVal = (data.liveYard && data.liveYard[item.specialKey] !== undefined && data.liveYard[item.specialKey] !== null) 
+          ? data.liveYard[item.specialKey] 
+          : ((data.lockedAssignment && data.lockedAssignment[item.specialKey] !== undefined && data.lockedAssignment[item.specialKey] !== null) 
+            ? data.lockedAssignment[item.specialKey] : 0);
+        
+        const liveVal = (data.liveYard && data.liveYard[item.key] !== undefined && data.liveYard[item.key] !== null) 
+          ? data.liveYard[item.key] : 0;
 
         html += `
           <tr>
@@ -396,7 +403,8 @@ async function loadDashboard() {
     function renderTomorrowRows(items) {
       let html = '';
       items.forEach(item => {
-        const liveVal = (data.liveYard && data.liveYard[item.key] !== undefined) ? data.liveYard[item.key] : 0;
+        const liveVal = (data.liveYard && data.liveYard[item.key] !== undefined && data.liveYard[item.key] !== null) 
+          ? data.liveYard[item.key] : 0;
 
         html += `
           <tr>
