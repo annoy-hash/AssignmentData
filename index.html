@@ -14,7 +14,7 @@
       display: flex;
       flex-direction: column;
     }
-    /* PC CONSTRAINTS: Keeps layout centered and balanced */
+    
     .dashboard-container {
       max-width: 920px;
       margin: 0 auto;
@@ -36,7 +36,7 @@
       display: block;
     }
 
-    /* SEPARATE CONTROLS BAR (Date Badge & Refresh Button) */
+    /* CONTROLS BAR */
     .controls-bar {
       background-color: #ffffff;
       border: 1px solid #e2e8f0;
@@ -70,9 +70,8 @@
       color: white;
     }
 
-    /* ASSIGNMENT CARDS WITH BALANCED VERTICAL SPACING */
+    /* CARDS LAYOUT */
     .dashboard-card {
-      background-color: #ffffff;
       border: 0;
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -83,11 +82,24 @@
     .dashboard-card:last-child {
       margin-bottom: 12px;
     }
-    
-    /* LIGHT SKY BLUE TABLE HEADER BARS */
-    .table thead th { 
+
+    /* ----------------------------------------------------
+       SECTION 1: TODAY'S ASSIGNMENT - SKY BLUE THEME
+       ---------------------------------------------------- */
+    .card-today {
       background-color: #0284c7;
-      color: #ffffff; 
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    }
+
+    .table-today-theme {
+      background-color: transparent !important;
+      color: #ffffff;
+      margin-bottom: 0;
+    }
+
+    .table-today-theme thead th { 
+      background-color: #0369a1 !important;
+      color: #ffffff !important; 
       font-weight: 700; 
       text-align: center; 
       vertical-align: middle;
@@ -99,22 +111,89 @@
       white-space: nowrap;
     }
 
-    .table thead th.section-header-title {
+    .table-today-theme thead th.section-header-title {
       text-align: left;
-      white-space: nowrap;
     }
 
-    .table td { 
+    .table-today-theme td { 
       text-align: center; 
       vertical-align: middle; 
       padding: 12px 14px;
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
     }
-    
-    /* BOLD METRIC LABELS */
-    .table td.metric-name { 
+
+    .table-today-theme td.metric-name { 
       text-align: left; 
       font-weight: 700; 
-      color: #212529; 
+      color: #ffffff !important; 
+      white-space: nowrap;
+    }
+
+    /* TODAY'S BADGES */
+    .badge-today-booked {
+      background-color: #e2e8f0;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+
+    .badge-today-special {
+      background-color: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(4px);
+    }
+
+    .badge-today-balance {
+      background-color: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+
+    /* ----------------------------------------------------
+       SECTION 2: TOMORROW'S ASSIGNMENT - RSGT NAVY/SLATE THEME
+       ---------------------------------------------------- */
+    .card-tomorrow {
+      background-color: #f0f7f9;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 4px 12px rgba(0, 43, 73, 0.08);
+    }
+
+    .table-tomorrow-theme {
+      background-color: transparent !important;
+      margin-bottom: 0;
+    }
+
+    .table-tomorrow-theme thead th { 
+      background-color: #002b49 !important;
+      color: #ffffff !important; 
+      font-weight: 700; 
+      text-align: center; 
+      vertical-align: middle;
+      font-size: 0.95rem;
+      padding: 12px 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: none;
+      white-space: nowrap;
+    }
+
+    .table-tomorrow-theme thead th.section-header-title {
+      text-align: left;
+    }
+
+    .table-tomorrow-theme td { 
+      text-align: center; 
+      vertical-align: middle; 
+      padding: 12px 14px;
+      border-color: #e2e8f0;
+      color: #1e293b;
+    }
+    
+    .table-tomorrow-theme td.metric-name { 
+      text-align: left; 
+      font-weight: 700; 
+      color: #002b49 !important; 
       white-space: nowrap;
     }
 
@@ -130,28 +209,13 @@
       text-align: center;
     }
 
-    /* BOOKED BADGE: Light Neutral Grey */
-    .badge-booked { 
-      background-color: #f1f5f9; 
-      color: #334155;
-      border: 1px solid #cbd5e1;
-    }
-
-    /* SPECIAL BADGE: Amber/Orange Accent */
-    .badge-special {
-      background-color: #fff7ed;
-      color: #c2410c;
-      border: 1px solid #ffedd5;
-    }
-
-    /* BALANCE/LIVE BADGE: Light Blue */
-    .badge-live { 
+    .badge-tomorrow-live { 
       background-color: #e0f2fe; 
-      color: #0284c7;
+      color: #004e64;
       border: 1px solid #bae6fd;
     }
 
-    /* BOTTOM RIGHT TIMESTAMP FOOTER */
+    /* FOOTER TIMESTAMP */
     .footer-timestamp {
       margin-top: auto;
       padding: 15px 24px;
@@ -219,7 +283,7 @@
 
 <div class="container dashboard-container py-2">
 
-  <!-- STANDALONE CONTROL BAR -->
+  <!-- CONTROL BAR -->
   <div class="controls-bar shadow-sm d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center gap-2">
       <span class="small text-muted fw-bold">Date:</span>
@@ -230,10 +294,10 @@
     </button>
   </div>
 
-  <!-- SECTION 1: TODAY'S ASSIGNMENT (WITH BOOKED, SPECIAL & BALANCE) -->
-  <div class="card dashboard-card">
+  <!-- SECTION 1: TODAY'S ASSIGNMENT (SKY BLUE CARD) -->
+  <div class="card dashboard-card card-today">
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
+      <table class="table table-today-theme align-middle mb-0">
         <thead>
           <tr>
             <th class="section-header-title ps-3" style="width: 34%;">1. Today's Assignment</th>
@@ -243,41 +307,24 @@
           </tr>
         </thead>
         <tbody id="todayKpiRows">
-          <tr><td colspan="4" class="py-3 text-muted">Loading...</td></tr>
+          <tr><td colspan="4" class="py-3 text-white-50">Loading Today's Assignment...</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- SECTION 2: SPECIAL ASSIGNMENT -->
-  <div class="card dashboard-card">
+  <!-- SECTION 2: TOMORROW'S ASSIGNMENT (NAVY/SLATE CARD) -->
+  <div class="card dashboard-card card-tomorrow">
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
+      <table class="table table-tomorrow-theme align-middle mb-0">
         <thead>
           <tr>
-            <th class="section-header-title ps-3" style="width: 40%;">2. Special Assignment</th>
-            <th style="width: 60%;">Balance</th>
-          </tr>
-        </thead>
-        <tbody id="specialKpiRows">
-          <tr><td colspan="2" class="py-3 text-muted">Loading Special Assignment...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- SECTION 3: TOMORROW'S ASSIGNMENT -->
-  <div class="card dashboard-card">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead>
-          <tr>
-            <th class="section-header-title ps-3" style="width: 40%;">3. Tomorrow's Assignment</th>
+            <th class="section-header-title ps-3" style="width: 40%;">2. Tomorrow's Assignment</th>
             <th style="width: 60%;">Balance</th>
           </tr>
         </thead>
         <tbody id="tomorrowKpiRows">
-          <tr><td colspan="2" class="py-3 text-muted">Loading...</td></tr>
+          <tr><td colspan="2" class="py-3 text-muted">Loading Tomorrow's Assignment...</td></tr>
         </tbody>
       </table>
     </div>
@@ -291,7 +338,6 @@
 </div>
 
 <script>
-// Display Today's Date inside the Control Bar
 function setSectionDate() {
   const now = new Date();
   const formattedDate = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
@@ -299,7 +345,6 @@ function setSectionDate() {
 }
 setSectionDate();
 
-// Fetch Data Payload
 async function loadDashboard() {
   try {
     const response = await fetch('data.json?cacheBust=' + new Date().getTime());
@@ -312,17 +357,11 @@ async function loadDashboard() {
       document.getElementById('lastUpdated').innerText = `- Last updated ${formattedDate}, ${formattedTime}`;
     }
 
-    // Config for Today's Table (Including Reefer)
     const todayList = [
       { label: 'CV', key: 'Today_CV', specialKey: 'Today_Special_CV' },
       { label: 'OCD', key: 'Today_OCD', specialKey: 'Today_Special_OCD' },
       { label: 'Inspection', key: 'Today_INS', specialKey: 'Today_Special_INS' },
       { label: 'Reefer', key: 'Today_Reefer_Total', bookedKey: 'Today_Reefer_Booked', specialKey: 'Today_Special_Reefer' }
-    ];
-
-    const specialList = [
-      { label: 'Special OCD', key: 'Today_Special_OCD' },
-      { label: 'Special Reefer', key: 'Today_Special_Reefer' }
     ];
 
     const tomorrowList = [
@@ -335,39 +374,36 @@ async function loadDashboard() {
     function renderTodayRows(items) {
       let html = '';
       items.forEach(item => {
-        // Use custom bookedKey if present (e.g. for Reefer), otherwise default to standard key
         const bKey = item.bookedKey || item.key;
         const bookedVal = (data.lockedAssignment && data.lockedAssignment[bKey] !== undefined) ? data.lockedAssignment[bKey] : 0;
         
-        // Extract Special assignment count
         const specialVal = (data.liveYard && data.liveYard[item.specialKey] !== undefined) 
                           ? data.liveYard[item.specialKey] 
                           : ((data.lockedAssignment && data.lockedAssignment[item.specialKey] !== undefined) ? data.lockedAssignment[item.specialKey] : 0);
         
-        // Extract Balance / Live Yard count
         const liveVal = (data.liveYard && data.liveYard[item.key] !== undefined) ? data.liveYard[item.key] : 0;
 
         html += `
           <tr>
-            <td class="metric-name ps-3"><b>${item.label}</b></td>
-            <td><span class="metric-pill badge-booked">${bookedVal}</span></td>
-            <td><span class="metric-pill badge-special">${specialVal}</span></td>
-            <td><span class="metric-pill badge-live">${liveVal}</span></td>
+            <td class="metric-name ps-3">${item.label}</td>
+            <td><span class="metric-pill badge-today-booked">${bookedVal}</span></td>
+            <td><span class="metric-pill badge-today-special">${specialVal}</span></td>
+            <td><span class="metric-pill badge-today-balance">${liveVal}</span></td>
           </tr>
         `;
       });
       return html;
     }
 
-    function renderLiveOnlyRows(items) {
+    function renderTomorrowRows(items) {
       let html = '';
       items.forEach(item => {
         const liveVal = (data.liveYard && data.liveYard[item.key] !== undefined) ? data.liveYard[item.key] : 0;
 
         html += `
           <tr>
-            <td class="metric-name ps-3"><b>${item.label}</b></td>
-            <td><span class="metric-pill badge-live">${liveVal}</span></td>
+            <td class="metric-name ps-3">${item.label}</td>
+            <td><span class="metric-pill badge-tomorrow-live">${liveVal}</span></td>
           </tr>
         `;
       });
@@ -375,15 +411,13 @@ async function loadDashboard() {
     }
 
     document.getElementById('todayKpiRows').innerHTML = renderTodayRows(todayList);
-    document.getElementById('specialKpiRows').innerHTML = renderLiveOnlyRows(specialList);
-    document.getElementById('tomorrowKpiRows').innerHTML = renderLiveOnlyRows(tomorrowList);
+    document.getElementById('tomorrowKpiRows').innerHTML = renderTomorrowRows(tomorrowList);
 
   } catch (err) {
     console.error('Failed to load data.json:', err);
   }
 }
 
-// Manual Refresh Trigger Function
 async function triggerManualRefresh() {
   const btn = document.getElementById('refreshBtn');
   btn.disabled = true;
@@ -408,7 +442,7 @@ async function triggerManualRefresh() {
 }
 
 loadDashboard();
-setInterval(loadDashboard, 30000); // Auto-refresh every 30 seconds
+setInterval(loadDashboard, 30000);
 </script>
 </body>
 </html>
