@@ -37,6 +37,20 @@
       display: block;
     }
 
+    /* SECTION TITLE WITH CLEAN UNDERLINE */
+    .dashboard-title-wrapper {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .dashboard-title {
+      color: #002b49;
+      display: inline-block;
+      border-bottom: 2px solid #002b49;
+      padding-bottom: 4px;
+      margin-bottom: 0;
+    }
+
     /* CONTROLS BAR */
     .controls-bar {
       background-color: #ffffff;
@@ -54,21 +68,6 @@
       padding: 6px 14px;
       border-radius: 20px;
       display: inline-block;
-    }
-
-    .btn-refresh {
-      background-color: #0284c7;
-      color: #ffffff;
-      border: 1px solid #0084c7;
-      font-weight: 600;
-      font-size: 0.85rem;
-      padding: 6px 14px;
-      border-radius: 6px;
-      transition: all 0.2s ease-in-out;
-    }
-    .btn-refresh:hover {
-      background-color: #006dae;
-      color: #ffffff;
     }
 
     /* CARDS LAYOUT */
@@ -204,37 +203,60 @@
       }
 
       .dashboard-container {
-        padding-left: 4px;
-        padding-right: 4px;
+        padding-left: 2px;
+        padding-right: 2px;
+      }
+
+      .dashboard-title-wrapper {
+        margin-top: 4px;
+        margin-bottom: 12px !important;
+      }
+
+      .dashboard-title {
+        font-size: 1.15rem !important;
+        border-bottom-width: 2px;
+        padding-bottom: 2px;
       }
 
       .dashboard-card {
-        margin-bottom: 20px;
+        margin-bottom: 16px;
       }
 
       .table thead th {
-        font-size: 0.8rem;
-        padding: 10px 6px;
+        font-size: 0.75rem !important;
+        padding: 8px 3px !important;
+        letter-spacing: 0;
       }
 
       .table td {
-        padding: 10px 4px;
+        padding: 8px 2px !important;
       }
 
       .table td.metric-name {
-        font-size: 0.95rem !important;
-        padding-left: 10px !important;
+        font-size: 0.82rem !important;
+        padding-left: 6px !important;
+      }
+
+      .table td.metric-name i {
+        margin-right: 4px !important;
+        font-size: 0.85rem;
       }
 
       .metric-pill {
-        min-width: 55px;
-        padding: 4px 10px;
-        font-size: 0.88rem;
+        min-width: 42px;
+        padding: 3px 6px;
+        font-size: 0.8rem;
+        border-radius: 12px;
       }
 
       .controls-bar {
-        padding: 8px 12px;
-        margin-bottom: 18px;
+        padding: 8px 10px;
+        margin-bottom: 14px;
+      }
+
+      .date-badge {
+        font-size: 0.78rem;
+        padding: 4px 10px;
       }
     }
   </style>
@@ -256,27 +278,29 @@
 
 <div class="container dashboard-container py-2">
 
+  <!-- TITLE -->
+  <div class="dashboard-title-wrapper">
+    <h4 class="fw-bold dashboard-title">One Stop Booking Breakdown</h4>
+  </div>
+
   <!-- CONTROL BAR -->
   <div class="controls-bar shadow-sm d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center gap-2">
       <span class="small text-muted fw-bold">Date:</span>
       <span id="sectionDate" class="date-badge">--/--/----</span>
     </div>
-    <button id="refreshBtn" class="btn btn-refresh shadow-sm" onclick="triggerManualRefresh()">
-      <i class="bi bi-arrow-clockwise me-1"></i> Refresh Data
-    </button>
   </div>
 
-  <!-- SECTION 1: TODAY'S ASSIGNMENT -->
+  <!-- SECTION 1: TODAY -->
   <div class="card dashboard-card card-today">
     <div class="table-responsive">
       <table class="table table-today-theme align-middle mb-0">
         <thead>
           <tr>
-            <th class="section-header-title ps-3" style="width: 34%;">1. Today's Assignment</th>
-            <th style="width: 22%;">Booked</th>
-            <th style="width: 22%;">Special</th>
-            <th style="width: 22%;">Balance</th>
+            <th class="section-header-title ps-3" style="width: 31%;">Today</th>
+            <th style="width: 23%;">Booked</th>
+            <th style="width: 23%;">Special</th>
+            <th style="width: 23%;">Balance</th>
           </tr>
         </thead>
         <tbody id="todayKpiRows">
@@ -286,14 +310,14 @@
     </div>
   </div>
 
-  <!-- SECTION 2: TOMORROW'S ASSIGNMENT -->
+  <!-- SECTION 2: TOMORROW -->
   <div class="card dashboard-card card-tomorrow">
     <div class="table-responsive">
       <table class="table table-tomorrow-theme align-middle mb-0">
         <thead>
           <tr>
-            <th class="section-header-title ps-3" style="width: 40%;">2. Tomorrow's Assignment</th>
-            <th style="width: 60%;">Balance</th>
+            <th class="section-header-title ps-3" style="width: 31%;">Tomorrow</th>
+            <th style="width: 69%;">Balance</th>
           </tr>
         </thead>
         <tbody id="tomorrowKpiRows">
@@ -403,29 +427,6 @@ async function loadDashboard() {
 
   } catch (err) {
     console.error('Failed to load data.json:', err);
-  }
-}
-
-async function triggerManualRefresh() {
-  const btn = document.getElementById('refreshBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Refreshing...';
-
-  const scriptUrl = 'https://script.google.com/macros/s/YOUR_APPS_SCRIPT_DEPLOYMENT_ID/exec';
-
-  try {
-    await fetch(scriptUrl, { method: 'POST', mode: 'no-cors' });
-    
-    setTimeout(async () => {
-      await loadDashboard();
-      btn.disabled = false;
-      btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i> Refresh Data';
-    }, 15000);
-
-  } catch (err) {
-    console.error('Refresh request failed:', err);
-    btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i> Refresh Data';
   }
 }
 
