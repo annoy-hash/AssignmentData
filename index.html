@@ -74,13 +74,25 @@
     .dashboard-card {
       border: 0;
       border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       overflow: hidden;
       margin-bottom: 24px;
     }
 
     .dashboard-card:last-child {
       margin-bottom: 12px;
+    }
+
+    /* COMMON BADGE STYLING */
+    .metric-pill {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 5px 16px;
+      border-radius: 8px;
+      display: inline-block;
+      min-width: 70px;
+      text-align: center;
     }
 
     /* ----------------------------------------------------
@@ -130,7 +142,6 @@
       white-space: nowrap;
     }
 
-    /* TODAY'S BADGES */
     .badge-today-booked {
       background-color: #e2e8f0;
       color: #475569;
@@ -151,21 +162,21 @@
     }
 
     /* ----------------------------------------------------
-       SECTION 2: TOMORROW'S ASSIGNMENT - RSGT NAVY/SLATE THEME
+       SECTION 2: TOMORROW'S ASSIGNMENT - RSGT SOLID NAVY BLUE THEME
        ---------------------------------------------------- */
     .card-tomorrow {
-      background-color: #f0f7f9;
-      border: 1px solid #cbd5e1;
-      box-shadow: 0 4px 12px rgba(0, 43, 73, 0.08);
+      background-color: #002b49;
+      box-shadow: 0 4px 12px rgba(0, 43, 73, 0.3);
     }
 
     .table-tomorrow-theme {
       background-color: transparent !important;
+      color: #ffffff;
       margin-bottom: 0;
     }
 
     .table-tomorrow-theme thead th { 
-      background-color: #002b49 !important;
+      background-color: #001a2d !important;
       color: #ffffff !important; 
       font-weight: 700; 
       text-align: center; 
@@ -186,33 +197,21 @@
       text-align: center; 
       vertical-align: middle; 
       padding: 12px 14px;
-      border-color: #e2e8f0;
-      color: #1e293b;
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
     }
-    
+
     .table-tomorrow-theme td.metric-name { 
       text-align: left; 
       font-weight: 700; 
-      color: #002b49 !important; 
+      color: #ffffff !important; 
       white-space: nowrap;
     }
 
-    /* BADGE STYLING */
-    .metric-pill {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-size: 1.05rem;
-      font-weight: 700;
-      padding: 5px 16px;
-      border-radius: 8px;
-      display: inline-block;
-      min-width: 70px;
-      text-align: center;
-    }
-
     .badge-tomorrow-live { 
-      background-color: #e0f2fe; 
-      color: #004e64;
-      border: 1px solid #bae6fd;
+      background-color: rgba(255, 255, 255, 0.18); 
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
     }
 
     /* FOOTER TIMESTAMP */
@@ -313,7 +312,7 @@
     </div>
   </div>
 
-  <!-- SECTION 2: TOMORROW'S ASSIGNMENT (NAVY/SLATE CARD) -->
+  <!-- SECTION 2: TOMORROW'S ASSIGNMENT (SOLID RSGT NAVY BLUE CARD) -->
   <div class="card dashboard-card card-tomorrow">
     <div class="table-responsive">
       <table class="table table-tomorrow-theme align-middle mb-0">
@@ -324,7 +323,7 @@
           </tr>
         </thead>
         <tbody id="tomorrowKpiRows">
-          <tr><td colspan="2" class="py-3 text-muted">Loading Tomorrow's Assignment...</td></tr>
+          <tr><td colspan="2" class="py-3 text-white-50">Loading Tomorrow's Assignment...</td></tr>
         </tbody>
       </table>
     </div>
@@ -368,7 +367,6 @@ async function loadDashboard() {
       { label: 'CV', key: 'Tomorrow_CV' },
       { label: 'OCD', key: 'Tomorrow_OCD' },
       { label: 'Inspection', key: 'Tomorrow_INS' },
-      { label: 'Reefer', key: 'Tomorrow_Reefer' }
     ];
 
     function renderTodayRows(items) {
