@@ -78,6 +78,7 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       overflow: hidden;
       margin-bottom: 24px;
+      background-color: #ffffff !important;
     }
 
     .dashboard-card:last-child {
@@ -117,21 +118,18 @@
     }
 
     /* ----------------------------------------------------
-       SECTION 1: TODAY'S ASSIGNMENT - SKY BLUE THEME
+       TABLE STYLING (BLACK TEXT FOR BOTH TODAY & TOMORROW)
        ---------------------------------------------------- */
-    .card-today {
-      background-color: #0284c7 !important;
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
-    }
-
-    .table-today-theme {
-      background-color: transparent !important;
-      color: #ffffff !important;
+    .table-today-theme,
+    .table-tomorrow-theme {
+      background-color: #ffffff !important;
+      color: #000000 !important;
       margin-bottom: 0;
     }
 
+    /* HEADER STYLING */
     .table-today-theme thead th { 
-      background-color: #0369a1 !important;
+      background-color: #0284c7 !important;
       color: #ffffff !important; 
       font-weight: 700; 
       text-align: center; 
@@ -144,74 +142,50 @@
       white-space: nowrap;
     }
 
-    .table-today-theme thead th.section-header-title {
+    .table-tomorrow-theme thead th { 
+      background-color: #002b49 !important;
+      color: #ffffff !important; 
+      font-weight: 700; 
+      text-align: center; 
+      vertical-align: middle;
+      font-size: 0.95rem;
+      padding: 12px 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: none;
+      white-space: nowrap;
+    }
+
+    .table-today-theme thead th.section-header-title,
+    .table-tomorrow-theme thead th.section-header-title {
       text-align: left;
     }
 
-    .table-today-theme td { 
-      text-align: center; 
-      vertical-align: middle; 
-      padding: 12px 14px;
-      border-color: rgba(255, 255, 255, 0.2) !important;
-      color: #ffffff !important;
-    }
-
-    /* FORCE METRIC NAMES TO BRIGHT WHITE WITH HOVER EFFECT */
+    /* FORCE METRIC NAME LABELS TO BLACK */
     .table-today-theme td.metric-name,
     .table-tomorrow-theme td.metric-name { 
       text-align: left !important; 
-      font-weight: 700 !important; 
+      font-weight: 800 !important; 
       font-size: 1.05rem !important;
-      color: #ffffff !important; 
+      color: #000000 !important; 
       white-space: nowrap !important;
       opacity: 1 !important;
+    }
+
+    .table-today-theme td,
+    .table-tomorrow-theme td { 
+      text-align: center; 
+      vertical-align: middle; 
+      padding: 12px 14px;
+      border-color: #e2e8f0 !important;
+      color: #000000 !important;
     }
 
     /* TABLE ROW HOVER HIGHLIGHT */
     .table-today-theme tbody tr:hover,
     .table-tomorrow-theme tbody tr:hover {
-      background-color: rgba(255, 255, 255, 0.1) !important;
+      background-color: #f1f5f9 !important;
       transition: background-color 0.15s ease-in-out;
-    }
-
-    /* ----------------------------------------------------
-       SECTION 2: TOMORROW'S ASSIGNMENT - SOLID NAVY BLUE THEME
-       ---------------------------------------------------- */
-    .card-tomorrow {
-      background-color: #002b49 !important;
-      box-shadow: 0 4px 12px rgba(0, 43, 73, 0.3);
-    }
-
-    .table-tomorrow-theme {
-      background-color: transparent !important;
-      color: #ffffff !important;
-      margin-bottom: 0;
-    }
-
-    .table-tomorrow-theme thead th { 
-      background-color: #001a2d !important;
-      color: #ffffff !important; 
-      font-weight: 700; 
-      text-align: center; 
-      vertical-align: middle;
-      font-size: 0.95rem;
-      padding: 12px 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border: none;
-      white-space: nowrap;
-    }
-
-    .table-tomorrow-theme thead th.section-header-title {
-      text-align: left;
-    }
-
-    .table-tomorrow-theme td { 
-      text-align: center; 
-      vertical-align: middle; 
-      padding: 12px 14px;
-      border-color: rgba(255, 255, 255, 0.2) !important;
-      color: #ffffff !important;
     }
 
     /* FOOTER TIMESTAMP */
@@ -293,7 +267,7 @@
     </button>
   </div>
 
-  <!-- SECTION 1: TODAY'S ASSIGNMENT (SKY BLUE CARD) -->
+  <!-- SECTION 1: TODAY'S ASSIGNMENT -->
   <div class="card dashboard-card card-today">
     <div class="table-responsive">
       <table class="table table-today-theme align-middle mb-0">
@@ -306,13 +280,13 @@
           </tr>
         </thead>
         <tbody id="todayKpiRows">
-          <tr><td colspan="4" class="py-3 text-white">Loading Today's Assignment...</td></tr>
+          <tr><td colspan="4" class="py-3 text-black">Loading Today's Assignment...</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- SECTION 2: TOMORROW'S ASSIGNMENT (SOLID RSGT NAVY BLUE CARD) -->
+  <!-- SECTION 2: TOMORROW'S ASSIGNMENT -->
   <div class="card dashboard-card card-tomorrow">
     <div class="table-responsive">
       <table class="table table-tomorrow-theme align-middle mb-0">
@@ -323,7 +297,7 @@
           </tr>
         </thead>
         <tbody id="tomorrowKpiRows">
-          <tr><td colspan="2" class="py-3 text-white">Loading Tomorrow's Assignment...</td></tr>
+          <tr><td colspan="2" class="py-3 text-black">Loading Tomorrow's Assignment...</td></tr>
         </tbody>
       </table>
     </div>
@@ -395,8 +369,8 @@ async function loadDashboard() {
 
         html += `
           <tr>
-            <td class="metric-name ps-3" style="color: #ffffff !important;">
-              <i class="bi ${item.icon} me-2 text-white-50"></i>${item.label}
+            <td class="metric-name ps-3" style="color: #000000 !important;">
+              <i class="bi ${item.icon} me-2 text-primary"></i>${item.label}
             </td>
             <td><span class="metric-pill pill-booked">${bookedVal}</span></td>
             <td><span class="metric-pill pill-special">${specialVal}</span></td>
@@ -414,8 +388,8 @@ async function loadDashboard() {
 
         html += `
           <tr>
-            <td class="metric-name ps-3" style="color: #ffffff !important;">
-              <i class="bi ${item.icon} me-2 text-white-50"></i>${item.label}
+            <td class="metric-name ps-3" style="color: #000000 !important;">
+              <i class="bi ${item.icon} me-2 text-primary"></i>${item.label}
             </td>
             <td><span class="metric-pill pill-balance">${liveVal}</span></td>
           </tr>
