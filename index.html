@@ -18,16 +18,16 @@
       background-color: #002b49; 
       color: white; 
       border-radius: 0 0 8px 8px; 
-      padding: 10px 20px;
+      padding: 12px 20px;
     }
     
-    /* Logo Styling — Balanced Padding on Top, Bottom, Left, and Right */
+    /* Logo Styling — Equal Padding on All 4 Sides (Top, Bottom, Left, Right) */
     .brand-logo {
       height: 52px; 
       width: auto; 
       border-radius: 6px; 
       background: white; 
-      padding: 6px 10px; /* Equalized padding on all 4 sides */
+      padding: 8px 8px; /* Balanced 8px padding on all 4 sides */
       object-fit: contain;
       box-sizing: border-box;
       display: block;
@@ -51,12 +51,11 @@
       font-weight: 600;
       color: #0084c7;
       background-color: #e0f2fe;
-      padding: 3px 10px;
+      padding: 4px 12px;
       border-radius: 12px;
     }
-    .badge-booked { background-color: #6c757d; }
-    .badge-live { background-color: #0284c7; } /* Sky Blue Badge */
     
+    /* Table & Metric Styling */
     .table thead th { 
       background-color: #0284c7; /* Sky Blue Table Headers */
       color: white; 
@@ -65,6 +64,25 @@
     }
     .table td { text-align: center; vertical-align: middle; }
     .table td.metric-name { text-align: left; font-weight: 600; color: #212529; width: 40%; }
+
+    .badge-booked { background-color: #6c757d; }
+    .badge-live { background-color: #0284c7; } /* Sky Blue Badge */
+
+    /* Refresh Button Styling */
+    .btn-refresh {
+      background-color: #0284c7;
+      color: white;
+      border: 1px solid #0084c7;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 6px 14px;
+      border-radius: 6px;
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-refresh:hover {
+      background-color: #006dae;
+      color: white;
+    }
 
     /* Subtle Bottom-Right Timestamp Footer */
     .footer-timestamp {
@@ -78,9 +96,9 @@
 </head>
 <body>
 
-<!-- TOP NAV HEADER -->
+<!-- TOP NAV HEADER WITH REFRESH BUTTON -->
 <div class="header-panel mb-4 shadow-sm">
-  <div class="container-fluid d-flex justify-content-between align-items-center flex-wrap">
+  <div class="container-fluid d-flex justify-content-between align-items-center flex-wrap gap-2">
     <!-- Logo and Title -->
     <div class="d-flex align-items-center gap-3">
       <img src="rsgt_bangladesh_logo.jpg" alt="RSGT Logo" class="brand-logo" onerror="this.style.display='none'">
@@ -88,6 +106,13 @@
         <h4 class="fw-bold mb-0 text-white">RSGT Bangladesh</h4>
         <div class="fw-semibold text-white-50 small">Terminal Delivery Dashboard</div>
       </div>
+    </div>
+    
+    <!-- Refresh Button -->
+    <div>
+      <button id="refreshBtn" class="btn btn-refresh shadow-sm" onclick="triggerManualRefresh()">
+        🔄 Refresh Data
+      </button>
     </div>
   </div>
 </div>
@@ -104,9 +129,9 @@
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th class="text-start ps-3"></th>
+            <th class="text-start ps-3">Box</th>
             <th style="width: 30%;">Today's Booked</th>
-            <th style="width: 30%;">Live Yard Data</th>
+            <th style="width: 30%;">Balance</th>
           </tr>
         </thead>
         <tbody id="todayKpiRows">
@@ -125,8 +150,8 @@
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th class="text-start ps-3"></th>
-            <th style="width: 60%;">Live Yard Data</th>
+            <th class="text-start ps-3">Box</th>
+            <th style="width: 60%;">Balance</th>
           </tr>
         </thead>
         <tbody id="specialKpiRows">
@@ -145,8 +170,8 @@
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th class="text-start ps-3"></th>
-            <th style="width: 60%;">Live Yard Data</th>
+            <th class="text-start ps-3">Box</th>
+            <th style="width: 60%;">Balance</th>
           </tr>
         </thead>
         <tbody id="tomorrowKpiRows">
@@ -178,7 +203,7 @@ async function loadDashboard() {
     const response = await fetch('data.json?cacheBust=' + new Date().getTime());
     const data = await response.json();
 
-    // Format timestamp at bottom: - Last updated 10/4/2026, 12:47:48 AM
+    // Format timestamp at bottom
     if (data.latestTimestamp) {
       const dt = new Date(data.latestTimestamp);
       const formattedDate = `${dt.getMonth() + 1}/${dt.getDate()}/${dt.getFullYear()}`;
@@ -247,8 +272,34 @@ async function loadDashboard() {
   }
 }
 
+// Manual Refresh Trigger Function
+async function triggerManualRefresh() {
+  const btn = document.getElementById('refreshBtn');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Refreshing...';
+
+  // Replace with your Apps Script Web App Deployment URL
+  const scriptUrl = 'https://script.google.com/macros/s/YOUR_APPS_SCRIPT_DEPLOYMENT_ID/exec';
+
+  try {
+    await fetch(scriptUrl, { method: 'POST', mode: 'no-cors' });
+    
+    // Allow Power Automate & Apps Script time to execute and sync (~15 sec)
+    setTimeout(async () => {
+      await loadDashboard();
+      btn.disabled = false;
+      btn.innerHTML = '🔄 Refresh Data';
+    }, 15000);
+
+  } catch (err) {
+    console.error('Refresh request failed:', err);
+    btn.disabled = false;
+    btn.innerHTML = '🔄 Refresh Data';
+  }
+}
+
 loadDashboard();
-setInterval(loadDashboard, 30000); // Refresh data every 30 seconds
+setInterval(loadDashboard, 30000); // Auto refresh data every 30 seconds
 </script>
 </body>
 </html>
