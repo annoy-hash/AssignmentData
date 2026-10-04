@@ -155,12 +155,15 @@
       color: #ffffff !important;
     }
 
-    .table-today-theme td.metric-name { 
-      text-align: left; 
-      font-weight: 700; 
-      font-size: 1rem;
+    /* FORCE METRIC NAMES TO BRIGHT WHITE */
+    .table-today-theme td.metric-name,
+    .table-tomorrow-theme td.metric-name { 
+      text-align: left !important; 
+      font-weight: 700 !important; 
+      font-size: 1.05rem !important;
       color: #ffffff !important; 
-      white-space: nowrap;
+      white-space: nowrap !important;
+      opacity: 1 !important;
     }
 
     /* ----------------------------------------------------
@@ -203,14 +206,6 @@
       color: #ffffff !important;
     }
 
-    .table-tomorrow-theme td.metric-name { 
-      text-align: left; 
-      font-weight: 700; 
-      font-size: 1rem;
-      color: #ffffff !important; 
-      white-space: nowrap;
-    }
-
     /* FOOTER TIMESTAMP */
     .footer-timestamp {
       margin-top: auto;
@@ -245,7 +240,7 @@
       }
 
       .table td.metric-name {
-        font-size: 0.88rem;
+        font-size: 0.95rem !important;
         padding-left: 10px !important;
       }
 
@@ -392,7 +387,7 @@ async function loadDashboard() {
 
         html += `
           <tr>
-            <td class="metric-name ps-3">${item.label}</td>
+            <td class="metric-name ps-3" style="color: #ffffff !important;">${item.label}</td>
             <td><span class="metric-pill pill-booked">${bookedVal}</span></td>
             <td><span class="metric-pill pill-special">${specialVal}</span></td>
             <td><span class="metric-pill pill-balance">${liveVal}</span></td>
@@ -409,7 +404,7 @@ async function loadDashboard() {
 
         html += `
           <tr>
-            <td class="metric-name ps-3">${item.label}</td>
+            <td class="metric-name ps-3" style="color: #ffffff !important;">${item.label}</td>
             <td><span class="metric-pill pill-balance">${liveVal}</span></td>
           </tr>
         `;
