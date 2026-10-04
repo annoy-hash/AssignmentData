@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RSGT Bangladesh — Terminal Delivery Dashboard</title>
+  <title>RSGT Bangladesh — Terminal Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body { 
@@ -21,46 +21,36 @@
       padding: 12px 20px;
     }
     
-    /* Logo Styling — Equal Padding on All 4 Sides (Top, Bottom, Left, Right) */
+    /* Cleaned Logo Styling — Direct logo display without white background container */
     .brand-logo {
       height: 52px; 
       width: auto; 
-      border-radius: 6px; 
-      background: white; 
-      padding: 8px 8px; /* Balanced 8px padding on all 4 sides */
+      padding: 0; 
       object-fit: contain;
-      box-sizing: border-box;
       display: block;
     }
 
-    .section-title { 
-      font-size: 1rem; 
-      font-weight: 700; 
-      letter-spacing: 0.5px; 
-      text-transform: uppercase; 
-      color: #0084c7; /* Sky Blue */
-      margin-bottom: 0; 
-    }
-    .section-header-wrapper {
-      border-bottom: 2px solid #e0f2fe; 
-      padding-bottom: 8px; 
-      margin-bottom: 15px;
-    }
     .date-badge {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 600;
-      color: #0084c7;
-      background-color: #e0f2fe;
-      padding: 4px 12px;
-      border-radius: 12px;
+      color: #002b49;
+      background-color: #ffffff;
+      padding: 3px 10px;
+      border-radius: 10px;
+      display: inline-block;
     }
     
-    /* Table & Metric Styling */
+    /* Table & Integrated Header Styling */
     .table thead th { 
-      background-color: #0284c7; /* Sky Blue Table Headers */
+      background-color: #0284c7; /* Sky Blue Header Bar */
       color: white; 
-      font-weight: 600; 
+      font-weight: 700; 
       text-align: center; 
+      font-size: 0.95rem;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .table td { text-align: center; vertical-align: middle; }
     .table td.metric-name { text-align: left; font-weight: 600; color: #212529; width: 40%; }
@@ -84,7 +74,7 @@
       color: white;
     }
 
-    /* Subtle Bottom-Right Timestamp Footer */
+    /* Bottom-Right Timestamp Footer */
     .footer-timestamp {
       margin-top: auto;
       padding: 15px 24px;
@@ -96,15 +86,15 @@
 </head>
 <body>
 
-<!-- TOP NAV HEADER WITH REFRESH BUTTON -->
+<!-- TOP NAV HEADER -->
 <div class="header-panel mb-4 shadow-sm">
   <div class="container-fluid d-flex justify-content-between align-items-center flex-wrap gap-2">
     <!-- Logo and Title -->
     <div class="d-flex align-items-center gap-3">
-      <img src="rsgt_bangladesh_logo.jpg" alt="RSGT Logo" class="brand-logo" onerror="this.style.display='none'">
+      <img src="rsgt_bangladesh_logo.png" alt="RSGT Logo" class="brand-logo" onerror="this.src='rsgt_bangladesh_logo.jpg';">
       <div>
         <h4 class="fw-bold mb-0 text-white">RSGT Bangladesh</h4>
-        <div class="fw-semibold text-white-50 small">Terminal Delivery Dashboard</div>
+        <div class="fw-semibold text-white-50 small">Terminal Dashboard</div>
       </div>
     </div>
     
@@ -119,17 +109,16 @@
 
 <div class="container py-2 py-md-3">
 
-  <!-- SECTION 1: TODAY'S ASSIGNMENT WITH DATE -->
-  <div class="card card-section p-3 p-md-4 bg-white mb-4 border-0 shadow-sm rounded-3">
-    <div class="d-flex justify-content-between align-items-center section-header-wrapper">
-      <div class="section-title">1. Today's Assignment</div>
-      <div id="sectionDate" class="date-badge">Date: --/--/----</div>
-    </div>
+  <!-- SECTION 1: TODAY'S ASSIGNMENT -->
+  <div class="card card-section bg-white mb-4 border-0 shadow-sm rounded-3 overflow-hidden">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th class="text-start ps-3">Box</th>
+            <th class="text-start ps-3" style="width: 40%;">
+              <span class="me-2">1. Today's Assignment</span>
+              <span id="sectionDate" class="date-badge">--/--/----</span>
+            </th>
             <th style="width: 30%;">Today's Booked</th>
             <th style="width: 30%;">Balance</th>
           </tr>
@@ -142,15 +131,12 @@
   </div>
 
   <!-- SECTION 2: SPECIAL ASSIGNMENT -->
-  <div class="card card-section p-3 p-md-4 bg-white mb-4 border-0 shadow-sm rounded-3">
-    <div class="section-header-wrapper">
-      <div class="section-title">2. Special Assignment</div>
-    </div>
+  <div class="card card-section bg-white mb-4 border-0 shadow-sm rounded-3 overflow-hidden">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th class="text-start ps-3">Box</th>
+            <th class="text-start ps-3" style="width: 40%;">2. Special Assignment</th>
             <th style="width: 60%;">Balance</th>
           </tr>
         </thead>
@@ -162,15 +148,12 @@
   </div>
 
   <!-- SECTION 3: TOMORROW'S ASSIGNMENT -->
-  <div class="card card-section p-3 p-md-4 bg-white mb-4 border-0 shadow-sm rounded-3">
-    <div class="section-header-wrapper">
-      <div class="section-title">3. Tomorrow's Assignment</div>
-    </div>
+  <div class="card card-section bg-white mb-4 border-0 shadow-sm rounded-3 overflow-hidden">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th class="text-start ps-3">Box</th>
+            <th class="text-start ps-3" style="width: 40%;">3. Tomorrow's Assignment</th>
             <th style="width: 60%;">Balance</th>
           </tr>
         </thead>
@@ -189,11 +172,11 @@
 </div>
 
 <script>
-// Display Today's Date directly on top of Today's Assignment
+// Display Today's Date inside the header
 function setSectionDate() {
   const now = new Date();
   const formattedDate = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
-  document.getElementById('sectionDate').innerText = `Date: ${formattedDate}`;
+  document.getElementById('sectionDate').innerText = formattedDate;
 }
 setSectionDate();
 
@@ -203,7 +186,6 @@ async function loadDashboard() {
     const response = await fetch('data.json?cacheBust=' + new Date().getTime());
     const data = await response.json();
 
-    // Format timestamp at bottom
     if (data.latestTimestamp) {
       const dt = new Date(data.latestTimestamp);
       const formattedDate = `${dt.getMonth() + 1}/${dt.getDate()}/${dt.getFullYear()}`;
@@ -211,20 +193,17 @@ async function loadDashboard() {
       document.getElementById('lastUpdated').innerText = `- Last updated ${formattedDate}, ${formattedTime}`;
     }
 
-    // Group 1: Today's Assignment
     const todayList = [
       { label: 'CV', key: 'Today_CV' },
       { label: 'OCD', key: 'Today_OCD' },
       { label: 'Inspection', key: 'Today_INS' }
     ];
 
-    // Group 2: Special Assignment
     const specialList = [
       { label: 'Special OCD', key: 'Today_Special_OCD' },
       { label: 'Special Reefer', key: 'Today_Special_Reefer' }
     ];
 
-    // Group 3: Tomorrow's Assignment
     const tomorrowList = [
       { label: 'CV', key: 'Tomorrow_CV' },
       { label: 'OCD', key: 'Tomorrow_OCD' },
@@ -278,13 +257,13 @@ async function triggerManualRefresh() {
   btn.disabled = true;
   btn.innerHTML = '⏳ Refreshing...';
 
-  // Replace with your Apps Script Web App Deployment URL
+  // Replace with your Google Apps Script Web App Deployment URL
   const scriptUrl = 'https://script.google.com/macros/s/YOUR_APPS_SCRIPT_DEPLOYMENT_ID/exec';
 
   try {
     await fetch(scriptUrl, { method: 'POST', mode: 'no-cors' });
     
-    // Allow Power Automate & Apps Script time to execute and sync (~15 sec)
+    // Wait for Power Automate and Google Apps Script execution cycle (~15 seconds)
     setTimeout(async () => {
       await loadDashboard();
       btn.disabled = false;
@@ -299,7 +278,7 @@ async function triggerManualRefresh() {
 }
 
 loadDashboard();
-setInterval(loadDashboard, 30000); // Auto refresh data every 30 seconds
+setInterval(loadDashboard, 30000); // Auto refresh dashboard every 30 seconds
 </script>
 </body>
 </html>
