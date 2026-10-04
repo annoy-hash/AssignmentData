@@ -3,98 +3,240 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RSGT Bangladesh — Terminal Dashboard</title>
+  <title>RSGT Bangladesh</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
+    /* GLOBAL TYPOGRAPHY & BACKGROUND */
     body { 
-      background-color: #f4f6f9; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      background-color: #f0f4f8; 
+      font-family: "Times New Roman", Times, serif; 
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      color: #1e293b;
     }
-    /* Dark Navy Header */
+
+    /* TOP HEADER PANEL */
     .header-panel { 
-      background-color: #002b49; 
+      background: linear-gradient(135deg, #002b49 0%, #00406c 100%); 
       color: white; 
-      border-radius: 0 0 8px 8px; 
-      padding: 12px 20px;
+      border-radius: 0 0 12px 12px; 
+      padding: 16px 24px;
+      box-shadow: 0 4px 12px rgba(0, 43, 73, 0.15);
     }
-    
-    /* Cleaned Logo Styling — Direct logo display without white background container */
+
+    /* LOGO STYLING */
     .brand-logo {
-      height: 52px; 
+      height: 48px; 
       width: auto; 
       padding: 0; 
       object-fit: contain;
       display: block;
     }
 
-    .date-badge {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #002b49;
-      background-color: #ffffff;
-      padding: 3px 10px;
-      border-radius: 10px;
-      display: inline-block;
-    }
-    
-    /* Table & Integrated Header Styling */
-    .table thead th { 
-      background-color: #0284c7; /* Sky Blue Header Bar */
-      color: white; 
-      font-weight: 700; 
-      text-align: center; 
-      font-size: 0.95rem;
-      padding-top: 12px;
-      padding-bottom: 12px;
-      text-transform: uppercase;
+    .brand-title {
+      font-size: 1.4rem;
+      font-weight: 700;
       letter-spacing: 0.5px;
     }
-    .table td { text-align: center; vertical-align: middle; }
-    .table td.metric-name { text-align: left; font-weight: 600; color: #212529; width: 40%; }
 
-    .badge-booked { background-color: #6c757d; }
-    .badge-live { background-color: #0284c7; } /* Sky Blue Badge */
+    .brand-subtitle {
+      font-size: 0.9rem;
+      opacity: 0.85;
+      font-style: italic;
+    }
 
-    /* Refresh Button Styling */
+    /* DATE BADGE */
+    .date-badge {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #002b49;
+      background-color: #ffffff;
+      padding: 4px 12px;
+      border-radius: 12px;
+      display: inline-block;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* SECTION CARDS */
+    .dashboard-card {
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    /* CENTERED TABLE HEADERS & ALIGNMENT */
+    .table {
+      margin-bottom: 0;
+      width: 100%;
+    }
+
+    .table thead th { 
+      background-color: #0284c7; /* Sky Blue */
+      color: #ffffff; 
+      font-weight: 700; 
+      font-size: 1.05rem;
+      padding: 12px 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      vertical-align: middle;
+      text-align: center; /* Center headers */
+      border: none;
+    }
+
+    /* Keep the first header column title left/center balanced */
+    .table thead th.section-header-title {
+      text-align: left;
+    }
+
+    .table tbody td { 
+      text-align: center; 
+      vertical-align: middle; 
+      padding: 12px 16px;
+      font-size: 1rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .table td.metric-name { 
+      text-align: left; 
+      font-weight: 700; 
+      color: #0f172a; 
+      font-size: 1.05rem;
+    }
+
+    /* BADGES FOR BOOKED AND BALANCE NUMBERS */
+    .metric-badge {
+      font-size: 1.1rem;
+      font-weight: bold;
+      padding: 6px 18px;
+      border-radius: 6px;
+      display: inline-block;
+      min-width: 70px;
+    }
+
+    .badge-booked { 
+      background-color: #f1f5f9; 
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+
+    .badge-balance { 
+      background-color: #e0f2fe; 
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+
+    /* REFRESH BUTTON */
     .btn-refresh {
       background-color: #0284c7;
       color: white;
-      border: 1px solid #0084c7;
-      font-weight: 600;
-      font-size: 0.85rem;
-      padding: 6px 14px;
+      border: none;
+      font-weight: bold;
+      font-size: 0.9rem;
+      padding: 8px 18px;
       border-radius: 6px;
-      transition: all 0.2s ease-in-out;
-    }
-    .btn-refresh:hover {
-      background-color: #006dae;
-      color: white;
+      transition: all 0.2s ease;
+      font-family: "Times New Roman", Times, serif;
     }
 
-    /* Bottom-Right Timestamp Footer */
+    .btn-refresh:hover {
+      background-color: #0369a1;
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    /* FOOTER TIMESTAMP */
     .footer-timestamp {
       margin-top: auto;
-      padding: 15px 24px;
+      padding: 16px 24px;
       text-align: right;
-      color: #6c757d;
-      font-size: 0.75rem;
+      color: #64748b;
+      font-size: 0.85rem;
+      font-style: italic;
+    }
+
+    /* MOBILE OPTIMIZATION (Screens smaller than 768px) */
+    @media (max-width: 767.98px) {
+      .header-panel {
+        padding: 12px 16px;
+      }
+      
+      .brand-title {
+        font-size: 1.15rem;
+      }
+
+      .table thead {
+        display: none; /* Hide default table header on small mobile screens */
+      }
+
+      .mobile-section-header {
+        background-color: #0284c7;
+        color: white;
+        padding: 10px 16px;
+        font-weight: bold;
+        font-size: 1.05rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-transform: uppercase;
+      }
+
+      .table tbody tr {
+        display: flex;
+        flex-direction: column;
+        padding: 12px 16px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 0;
+        border: none;
+        text-align: right;
+      }
+
+      .table td.metric-name {
+        font-size: 1.1rem;
+        padding-bottom: 6px;
+        border-bottom: 1px dashed #e2e8f0;
+        margin-bottom: 6px;
+      }
+
+      .table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #64748b;
+        font-size: 0.9rem;
+      }
+
+      .table td.metric-name::before {
+        content: ""; /* No prefix for metric name row */
+      }
+    }
+
+    @media (min-width: 768px) {
+      .mobile-section-header {
+        display: none; /* Hide mobile-only bar on PC */
+      }
     }
   </style>
 </head>
 <body>
 
 <!-- TOP NAV HEADER -->
-<div class="header-panel mb-4 shadow-sm">
+<div class="header-panel mb-4">
   <div class="container-fluid d-flex justify-content-between align-items-center flex-wrap gap-2">
     <!-- Logo and Title -->
     <div class="d-flex align-items-center gap-3">
       <img src="rsgt_bangladesh_logo.png" alt="RSGT Logo" class="brand-logo" onerror="this.src='rsgt_bangladesh_logo.jpg';">
       <div>
-        <h4 class="fw-bold mb-0 text-white">RSGT Bangladesh</h4>
-        <div class="fw-semibold text-white-50 small">Terminal Dashboard</div>
+        <div class="brand-title text-white">RSGT Bangladesh</div>
+        <div class="brand-subtitle text-white-50">Terminal Dashboard</div>
       </div>
     </div>
     
@@ -107,15 +249,19 @@
   </div>
 </div>
 
-<div class="container py-2 py-md-3">
+<div class="container py-2">
 
   <!-- SECTION 1: TODAY'S ASSIGNMENT -->
-  <div class="card card-section bg-white mb-4 border-0 shadow-sm rounded-3 overflow-hidden">
+  <div class="dashboard-card">
+    <div class="mobile-section-header">
+      <span>1. Today's Assignment</span>
+      <span id="mobileSectionDate" class="date-badge">--/--/----</span>
+    </div>
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
+      <table class="table align-middle">
         <thead>
           <tr>
-            <th class="text-start ps-3" style="width: 40%;">
+            <th class="section-header-title ps-3" style="width: 40%;">
               <span class="me-2">1. Today's Assignment</span>
               <span id="sectionDate" class="date-badge">--/--/----</span>
             </th>
@@ -124,41 +270,47 @@
           </tr>
         </thead>
         <tbody id="todayKpiRows">
-          <tr><td colspan="3" class="py-3 text-muted">Loading Today's Assignment...</td></tr>
+          <tr><td colspan="3" class="py-4 text-muted">Loading Today's Assignment...</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <!-- SECTION 2: SPECIAL ASSIGNMENT -->
-  <div class="card card-section bg-white mb-4 border-0 shadow-sm rounded-3 overflow-hidden">
+  <div class="dashboard-card">
+    <div class="mobile-section-header">
+      <span>2. Special Assignment</span>
+    </div>
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
+      <table class="table align-middle">
         <thead>
           <tr>
-            <th class="text-start ps-3" style="width: 40%;">2. Special Assignment</th>
+            <th class="section-header-title ps-3" style="width: 40%;">2. Special Assignment</th>
             <th style="width: 60%;">Balance</th>
           </tr>
         </thead>
         <tbody id="specialKpiRows">
-          <tr><td colspan="2" class="py-3 text-muted">Loading Special Assignment...</td></tr>
+          <tr><td colspan="2" class="py-4 text-muted">Loading Special Assignment...</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <!-- SECTION 3: TOMORROW'S ASSIGNMENT -->
-  <div class="card card-section bg-white mb-4 border-0 shadow-sm rounded-3 overflow-hidden">
+  <div class="dashboard-card">
+    <div class="mobile-section-header">
+      <span>3. Tomorrow's Assignment</span>
+    </div>
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
+      <table class="table align-middle">
         <thead>
           <tr>
-            <th class="text-start ps-3" style="width: 40%;">3. Tomorrow's Assignment</th>
+            <th class="section-header-title ps-3" style="width: 40%;">3. Tomorrow's Assignment</th>
             <th style="width: 60%;">Balance</th>
           </tr>
         </thead>
         <tbody id="tomorrowKpiRows">
-          <tr><td colspan="2" class="py-3 text-muted">Loading Tomorrow's Assignment...</td></tr>
+          <tr><td colspan="2" class="py-4 text-muted">Loading Tomorrow's Assignment...</td></tr>
         </tbody>
       </table>
     </div>
@@ -172,11 +324,12 @@
 </div>
 
 <script>
-// Display Today's Date inside the header
+// Set date display
 function setSectionDate() {
   const now = new Date();
   const formattedDate = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
   document.getElementById('sectionDate').innerText = formattedDate;
+  document.getElementById('mobileSectionDate').innerText = formattedDate;
 }
 setSectionDate();
 
@@ -219,8 +372,8 @@ async function loadDashboard() {
         html += `
           <tr>
             <td class="metric-name ps-3">${item.label}</td>
-            <td><span class="badge badge-booked fs-6 px-3 py-2">${bookedVal}</span></td>
-            <td><span class="badge badge-live fs-6 px-3 py-2">${liveVal}</span></td>
+            <td data-label="Today's Booked"><span class="metric-badge badge-booked">${bookedVal}</span></td>
+            <td data-label="Balance"><span class="metric-badge badge-balance">${liveVal}</span></td>
           </tr>
         `;
       });
@@ -235,7 +388,7 @@ async function loadDashboard() {
         html += `
           <tr>
             <td class="metric-name ps-3">${item.label}</td>
-            <td><span class="badge badge-live fs-6 px-3 py-2">${liveVal}</span></td>
+            <td data-label="Balance"><span class="metric-badge badge-balance">${liveVal}</span></td>
           </tr>
         `;
       });
@@ -257,13 +410,11 @@ async function triggerManualRefresh() {
   btn.disabled = true;
   btn.innerHTML = '⏳ Refreshing...';
 
-  // Replace with your Google Apps Script Web App Deployment URL
   const scriptUrl = 'https://script.google.com/macros/s/YOUR_APPS_SCRIPT_DEPLOYMENT_ID/exec';
 
   try {
     await fetch(scriptUrl, { method: 'POST', mode: 'no-cors' });
     
-    // Wait for Power Automate and Google Apps Script execution cycle (~15 seconds)
     setTimeout(async () => {
       await loadDashboard();
       btn.disabled = false;
@@ -278,7 +429,7 @@ async function triggerManualRefresh() {
 }
 
 loadDashboard();
-setInterval(loadDashboard, 30000); // Auto refresh dashboard every 30 seconds
+setInterval(loadDashboard, 30000); // Auto-refresh every 30s
 </script>
 </body>
 </html>
