@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RSGT Bangladesh — Terminal Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <style>
     /* GLOBAL LAYOUT & TYPOGRAPHY */
     body { 
@@ -155,7 +156,7 @@
       color: #ffffff !important;
     }
 
-    /* FORCE METRIC NAMES TO BRIGHT WHITE */
+    /* FORCE METRIC NAMES TO BRIGHT WHITE WITH HOVER EFFECT */
     .table-today-theme td.metric-name,
     .table-tomorrow-theme td.metric-name { 
       text-align: left !important; 
@@ -164,6 +165,13 @@
       color: #ffffff !important; 
       white-space: nowrap !important;
       opacity: 1 !important;
+    }
+
+    /* TABLE ROW HOVER HIGHLIGHT */
+    .table-today-theme tbody tr:hover,
+    .table-tomorrow-theme tbody tr:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      transition: background-color 0.15s ease-in-out;
     }
 
     /* ----------------------------------------------------
@@ -281,7 +289,7 @@
       <span id="sectionDate" class="date-badge">--/--/----</span>
     </div>
     <button id="refreshBtn" class="btn btn-refresh shadow-sm" onclick="triggerManualRefresh()">
-      🔄 Refresh Data
+      <i class="bi bi-arrow-clockwise me-1"></i> Refresh Data
     </button>
   </div>
 
@@ -349,17 +357,17 @@ async function loadDashboard() {
     }
 
     const todayList = [
-      { label: 'CV', key: 'Today_CV', specialKey: 'Today_Special_CV' },
-      { label: 'OCD', key: 'Today_OCD', specialKey: 'Today_Special_OCD' },
-      { label: 'Inspection', key: 'Today_INS', specialKey: 'Today_Special_INS' },
-      { label: 'Reefer', key: 'Today_Reefer_Total', bookedKey: 'Today_Reefer_Booked', specialKey: 'Today_Special_Reefer' }
+      { label: 'CV', icon: 'bi-truck', key: 'Today_CV', specialKey: 'Today_Special_CV' },
+      { label: 'OCD', icon: 'bi-box-seam', key: 'Today_OCD', specialKey: 'Today_Special_OCD' },
+      { label: 'Inspection', icon: 'bi-search', key: 'Today_INS', specialKey: 'Today_Special_INS' },
+      { label: 'Reefer', icon: 'bi-snow', key: 'Today_Reefer_Total', bookedKey: 'Today_Reefer_Booked', specialKey: 'Today_Special_Reefer' }
     ];
 
     const tomorrowList = [
-      { label: 'CV', key: 'Tomorrow_CV' },
-      { label: 'OCD', key: 'Tomorrow_OCD' },
-      { label: 'Inspection', key: 'Tomorrow_INS' },
-      { label: 'Reefer', key: 'Tomorrow_Reefer' }
+      { label: 'CV', icon: 'bi-truck', key: 'Tomorrow_CV' },
+      { label: 'OCD', icon: 'bi-box-seam', key: 'Tomorrow_OCD' },
+      { label: 'Inspection', icon: 'bi-search', key: 'Tomorrow_INS' },
+      { label: 'Reefer', icon: 'bi-snow', key: 'Tomorrow_Reefer' }
     ];
 
     function getValue(obj, key) {
@@ -387,7 +395,9 @@ async function loadDashboard() {
 
         html += `
           <tr>
-            <td class="metric-name ps-3" style="color: #ffffff !important;">${item.label}</td>
+            <td class="metric-name ps-3" style="color: #ffffff !important;">
+              <i class="bi ${item.icon} me-2 text-white-50"></i>${item.label}
+            </td>
             <td><span class="metric-pill pill-booked">${bookedVal}</span></td>
             <td><span class="metric-pill pill-special">${specialVal}</span></td>
             <td><span class="metric-pill pill-balance">${liveVal}</span></td>
@@ -404,7 +414,9 @@ async function loadDashboard() {
 
         html += `
           <tr>
-            <td class="metric-name ps-3" style="color: #ffffff !important;">${item.label}</td>
+            <td class="metric-name ps-3" style="color: #ffffff !important;">
+              <i class="bi ${item.icon} me-2 text-white-50"></i>${item.label}
+            </td>
             <td><span class="metric-pill pill-balance">${liveVal}</span></td>
           </tr>
         `;
@@ -423,7 +435,7 @@ async function loadDashboard() {
 async function triggerManualRefresh() {
   const btn = document.getElementById('refreshBtn');
   btn.disabled = true;
-  btn.innerHTML = '⏳ Refreshing...';
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Refreshing...';
 
   const scriptUrl = 'https://script.google.com/macros/s/YOUR_APPS_SCRIPT_DEPLOYMENT_ID/exec';
 
@@ -433,13 +445,13 @@ async function triggerManualRefresh() {
     setTimeout(async () => {
       await loadDashboard();
       btn.disabled = false;
-      btn.innerHTML = '🔄 Refresh Data';
+      btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i> Refresh Data';
     }, 15000);
 
   } catch (err) {
     console.error('Refresh request failed:', err);
     btn.disabled = false;
-    btn.innerHTML = '🔄 Refresh Data';
+    btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i> Refresh Data';
   }
 }
 
