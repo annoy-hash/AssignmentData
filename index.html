@@ -7,13 +7,13 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     /* GLOBAL LAYOUT & TYPOGRAPHY */
-body { 
-  background-color: #e0f7fa; 
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+    body { 
+      background-color: #e0f7fa; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
     /* PC CONSTRAINTS: Keeps layout centered and balanced */
     .dashboard-container {
       max-width: 920px;
@@ -77,7 +77,7 @@ body {
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       overflow: hidden;
-      margin-bottom: 24px; /* Balanced spacing between Today, Special, and Tomorrow */
+      margin-bottom: 24px;
     }
 
     .dashboard-card:last-child {
@@ -86,7 +86,7 @@ body {
     
     /* LIGHT SKY BLUE TABLE HEADER BARS */
     .table thead th { 
-      background-color: #0284c7; /* Sky Blue */
+      background-color: #0284c7;
       color: #ffffff; 
       font-weight: 700; 
       text-align: center; 
@@ -96,12 +96,12 @@ body {
       text-transform: uppercase;
       letter-spacing: 0.5px;
       border: none;
-      white-space: nowrap; /* Forces header text into a single line */
+      white-space: nowrap;
     }
 
     .table thead th.section-header-title {
       text-align: left;
-      white-space: nowrap; /* Prevents "Tomorrow's Assignment" & "Special Assignment" from wrapping */
+      white-space: nowrap;
     }
 
     .table td { 
@@ -115,10 +115,10 @@ body {
       text-align: left; 
       font-weight: 700; 
       color: #212529; 
-      white-space: nowrap; /* Keeps metric names on a single line */
+      white-space: nowrap;
     }
 
-    /* BADGE STYLING (Sans-Serif Font) */
+    /* BADGE STYLING */
     .metric-pill {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       font-size: 1.05rem;
@@ -130,14 +130,21 @@ body {
       text-align: center;
     }
 
-    /* LEFT BADGE: Light Neutral Grey */
+    /* BOOKED BADGE: Light Neutral Grey */
     .badge-booked { 
       background-color: #f1f5f9; 
       color: #334155;
       border: 1px solid #cbd5e1;
     }
 
-    /* RIGHT BADGE: Light Blue */
+    /* SPECIAL BADGE: Amber/Orange Accent */
+    .badge-special {
+      background-color: #fff7ed;
+      color: #c2410c;
+      border: 1px solid #ffedd5;
+    }
+
+    /* BALANCE/LIVE BADGE: Light Blue */
     .badge-live { 
       background-color: #e0f2fe; 
       color: #0284c7;
@@ -165,16 +172,16 @@ body {
       }
 
       .dashboard-card {
-        margin-bottom: 20px; /* Slight adjustment for small screens */
+        margin-bottom: 20px;
       }
 
       .table thead th {
         font-size: 0.8rem;
-        padding: 10px 8px;
+        padding: 10px 6px;
       }
 
       .table td {
-        padding: 10px 6px;
+        padding: 10px 4px;
       }
 
       .table td.metric-name {
@@ -183,9 +190,9 @@ body {
       }
 
       .metric-pill {
-        min-width: 55px;
-        padding: 4px 10px;
-        font-size: 0.9rem;
+        min-width: 50px;
+        padding: 4px 8px;
+        font-size: 0.88rem;
       }
 
       .controls-bar {
@@ -200,7 +207,6 @@ body {
 <!-- TOP NAV HEADER -->
 <div class="header-panel mb-3 shadow-sm">
   <div class="container-fluid d-flex justify-content-between align-items-center">
-    <!-- Logo and Title -->
     <div class="d-flex align-items-center gap-2">
       <img src="rsgt_bangladesh_logo.png" alt="RSGT Logo" class="brand-logo" onerror="this.src='rsgt_bangladesh_logo.jpg';">
       <div>
@@ -213,7 +219,7 @@ body {
 
 <div class="container dashboard-container py-2">
 
-  <!-- STANDALONE CONTROL BAR (DATE & REFRESH BUTTON SEPARATED FROM CARDS) -->
+  <!-- STANDALONE CONTROL BAR -->
   <div class="controls-bar shadow-sm d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center gap-2">
       <span class="small text-muted fw-bold">Date:</span>
@@ -224,21 +230,20 @@ body {
     </button>
   </div>
 
-  <!-- STACKED ASSIGNMENT CARDS -->
-  
-  <!-- SECTION 1: TODAY'S ASSIGNMENT -->
+  <!-- SECTION 1: TODAY'S ASSIGNMENT (WITH BOOKED, SPECIAL & BALANCE) -->
   <div class="card dashboard-card">
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th class="section-header-title ps-3" style="width: 40%;">1. Today's Assignment</th>
-            <th style="width: 30%;">Booked</th>
-            <th style="width: 30%;">Balance</th>
+            <th class="section-header-title ps-3" style="width: 34%;">1. Today's Assignment</th>
+            <th style="width: 22%;">Booked</th>
+            <th style="width: 22%;">Special</th>
+            <th style="width: 22%;">Balance</th>
           </tr>
         </thead>
         <tbody id="todayKpiRows">
-          <tr><td colspan="3" class="py-3 text-muted">Loading...</td></tr>
+          <tr><td colspan="4" class="py-3 text-muted">Loading...</td></tr>
         </tbody>
       </table>
     </div>
@@ -307,10 +312,12 @@ async function loadDashboard() {
       document.getElementById('lastUpdated').innerText = `- Last updated ${formattedDate}, ${formattedTime}`;
     }
 
+    // Config for Today's Table (Including Reefer)
     const todayList = [
-      { label: 'CV', key: 'Today_CV' },
-      { label: 'OCD', key: 'Today_OCD' },
-      { label: 'Inspection', key: 'Today_INS' }
+      { label: 'CV', key: 'Today_CV', specialKey: 'Today_Special_CV' },
+      { label: 'OCD', key: 'Today_OCD', specialKey: 'Today_Special_OCD' },
+      { label: 'Inspection', key: 'Today_INS', specialKey: 'Today_Special_INS' },
+      { label: 'Reefer', key: 'Today_Reefer_Total', bookedKey: 'Today_Reefer_Booked', specialKey: 'Today_Special_Reefer' }
     ];
 
     const specialList = [
@@ -321,19 +328,30 @@ async function loadDashboard() {
     const tomorrowList = [
       { label: 'CV', key: 'Tomorrow_CV' },
       { label: 'OCD', key: 'Tomorrow_OCD' },
-      { label: 'Inspection', key: 'Tomorrow_INS' }
+      { label: 'Inspection', key: 'Tomorrow_INS' },
+      { label: 'Reefer', key: 'Tomorrow_Reefer' }
     ];
 
     function renderTodayRows(items) {
       let html = '';
       items.forEach(item => {
-        const bookedVal = (data.lockedAssignment && data.lockedAssignment[item.key] !== undefined) ? data.lockedAssignment[item.key] : 0;
+        // Use custom bookedKey if present (e.g. for Reefer), otherwise default to standard key
+        const bKey = item.bookedKey || item.key;
+        const bookedVal = (data.lockedAssignment && data.lockedAssignment[bKey] !== undefined) ? data.lockedAssignment[bKey] : 0;
+        
+        // Extract Special assignment count
+        const specialVal = (data.liveYard && data.liveYard[item.specialKey] !== undefined) 
+                          ? data.liveYard[item.specialKey] 
+                          : ((data.lockedAssignment && data.lockedAssignment[item.specialKey] !== undefined) ? data.lockedAssignment[item.specialKey] : 0);
+        
+        // Extract Balance / Live Yard count
         const liveVal = (data.liveYard && data.liveYard[item.key] !== undefined) ? data.liveYard[item.key] : 0;
 
         html += `
           <tr>
             <td class="metric-name ps-3"><b>${item.label}</b></td>
             <td><span class="metric-pill badge-booked">${bookedVal}</span></td>
+            <td><span class="metric-pill badge-special">${specialVal}</span></td>
             <td><span class="metric-pill badge-live">${liveVal}</span></td>
           </tr>
         `;
