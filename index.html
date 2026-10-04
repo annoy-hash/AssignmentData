@@ -305,6 +305,31 @@
 
 </div>
 
+<!-- BOTTOM RIGHT TIMESTAMP FOOTER -->
+<div class="footer-timestamp">
+  <span id="lastUpdated">- Last updated --/--/----, --:--:-- --</span>
+</div>
+
+<script>
+function setSectionDate() {
+  const now = new Date();
+  const formattedDate = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
+  document.getElementById('sectionDate').innerText = formattedDate;
+}
+setSectionDate();
+
+async function loadDashboard() {
+  try {
+    const response = await fetch('data.json?cacheBust=' + new Date().getTime());
+    const data = await response.json();
+
+    if (data.latestTimestamp) {
+      const dt = new Date(data.latestTimestamp);
+      const formattedDate = `${dt.getMonth() + 1}/${dt.getDate()}/${dt.getFullYear()}`;
+      const formattedTime = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('lastUpdated').innerText = `- Last updated ${formattedDate}, ${formattedTime}`;
+    }
+
     const todayList = [
       { label: 'CV', icon: 'bi-truck', key: 'Today_CV', specialKey: 'Today_Special_CV' },
       { label: 'OCD', icon: 'bi-box-seam', key: 'Today_OCD', specialKey: 'Today_Special_OCD' },
