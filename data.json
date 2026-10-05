@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-10-05T19:33:03.671Z",
+  "updatedAt": "2026-10-05T19:45:51.694Z",
   "lockedTimestamp": "2026-10-05T17:52:57.372Z",
-  "latestTimestamp": "2026-10-05T19:33:01.103Z",
+  "latestTimestamp": "2026-10-05T19:45:48.795Z",
   "lockedAssignment": {
     "timestamp": "2026-10-05T17:52:57.372Z",
     "Today_CV": 170,
@@ -14,7 +14,7 @@
     "Tomorrow_INS": 0
   },
   "liveYard": {
-    "timestamp": "2026-10-05T19:33:01.103Z",
+    "timestamp": "2026-10-05T19:45:48.795Z",
     "Today_CV": 169,
     "Tomorrow_CV": 30,
     "Today_INS": 36,
