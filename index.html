@@ -367,11 +367,13 @@ async function loadDashboard() {
       { label: 'Inspection', icon: 'bi-search', key: 'Tomorrow_INS' }
     ];
 
+    // NUMERIC HELPER FUNCTION
     function getValue(obj, key) {
       if (!obj || obj[key] === undefined || obj[key] === null) {
         return 0;
       }
-      return obj[key];
+      const parsed = parseInt(obj[key], 10);
+      return isNaN(parsed) ? 0 : parsed;
     }
 
     function renderTodayRows(items) {
@@ -384,10 +386,10 @@ async function loadDashboard() {
         
         let specialVal = 0;
         if (item.calcSpecial === 'INS_DIFF') {
-          // Special Inspection = Balance - Booked
-          specialVal = liveVal - bookedVal;
+          // Explicit Math: Balance - Booked
+          specialVal = Math.max(0, liveVal - bookedVal);
         } else if (data.liveYard && data.liveYard[item.specialKey] !== undefined && data.liveYard[item.specialKey] !== null) {
-          specialVal = data.liveYard[item.specialKey];
+          specialVal = getValue(data.liveYard, item.specialKey);
         } else {
           specialVal = getValue(data.lockedAssignment, item.specialKey);
         }
