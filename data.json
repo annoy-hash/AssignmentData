@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-10-05T09:30:47.362Z",
+  "updatedAt": "2026-10-05T10:00:42.837Z",
   "lockedTimestamp": "2026-10-05T02:45:49.914Z",
-  "latestTimestamp": "2026-10-05T09:30:44.311Z",
+  "latestTimestamp": "2026-10-05T10:00:39.494Z",
   "lockedAssignment": {
     "timestamp": "2026-10-05T02:45:49.914Z",
     "Today_CV": 116,
@@ -14,22 +14,22 @@
     "Today_Special_Reefer": 0
   },
   "liveYard": {
-    "timestamp": "2026-10-05T09:30:44.311Z",
-    "Today_CV": 98,
-    "Tomorrow_CV": 82,
-    "Today_INS": 50,
-    "Tomorrow_INS": 20,
-    "Today_OCD": 92,
-    "Tomorrow_OCD": 19,
-    "Today_Special_OCD": 39,
+    "timestamp": "2026-10-05T10:00:39.494Z",
+    "Today_CV": 90,
+    "Tomorrow_CV": 88,
+    "Today_INS": 49,
+    "Tomorrow_INS": 23,
+    "Today_OCD": 71,
+    "Tomorrow_OCD": 22,
+    "Today_Special_OCD": 24,
     "Today_Special_Reefer": 9
   },
   "deliveredBalance": {
-    "CV": 18,
+    "CV": 26,
     "Tomorrow_CV": 0,
     "INS": 0,
     "Tomorrow_INS": 0,
-    "OCD": 0,
+    "OCD": 4,
     "Tomorrow_OCD": 0,
     "Special_OCD": 0,
     "Special_Reefer": 0
