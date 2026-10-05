@@ -57,7 +57,7 @@
       border: 1px solid #e2e8f0;
       border-radius: 8px;
       padding: 10px 16px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .date-badge {
@@ -292,7 +292,7 @@
   </div>
   
   <!-- LAST UPDATED OUTSIDE CONTROL BAR -->
-  <div id="lastUpdated" class="small text-muted fw-semibold text-start ps-1 mb-3">Last updated --/--/----, --:--:-- --</div>
+  <div id="lastUpdated" class="small text-muted fw-normal text-start ps-1 mb-3">Last updated --/--/----, --:--:-- --</div>
 
   <!-- SECTION 1: TODAY -->
   <div class="card dashboard-card card-today">
@@ -348,7 +348,7 @@ async function loadDashboard() {
     if (data.latestTimestamp) {
       const dt = new Date(data.latestTimestamp);
       const formattedDate = `${dt.getMonth() + 1}/${dt.getDate()}/${dt.getFullYear()}`;
-      const formattedTime = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const formattedTime = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       document.getElementById('lastUpdated').innerText = `Last updated ${formattedDate}, ${formattedTime}`;
     }
 
