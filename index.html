@@ -357,15 +357,14 @@ async function loadDashboard() {
     const todayList = [
       { label: 'CV', icon: 'bi-truck', key: 'Today_CV', specialKey: 'Today_Special_CV' },
       { label: 'OCD', icon: 'bi-box-seam', key: 'Today_OCD', specialKey: 'Today_Special_OCD' },
-      { label: 'Inspection', icon: 'bi-search', key: 'Today_INS', specialKey: 'INS_DIFF' },
+      { label: 'Inspection', icon: 'bi-search', key: 'Today_INS', calcSpecial: 'INS_DIFF' },
       { label: 'Reefer', icon: 'bi-snow', key: 'Today_Reefer_Total', bookedKey: 'Today_Reefer_Booked', specialKey: 'Today_Special_Reefer' }
     ];
 
     const tomorrowList = [
       { label: 'CV', icon: 'bi-truck', key: 'Tomorrow_CV' },
       { label: 'OCD', icon: 'bi-box-seam', key: 'Tomorrow_OCD' },
-      { label: 'Inspection', icon: 'bi-search', key: 'Tomorrow_INS' },
-      { label: 'Reefer', icon: 'bi-snow', key: 'Tomorrow_Reefer' }
+      { label: 'Inspection', icon: 'bi-search', key: 'Tomorrow_INS' }
     ];
 
     function getValue(obj, key) {
@@ -376,38 +375,36 @@ async function loadDashboard() {
     }
 
     function renderTodayRows(items) {
-  let html = '';
-  items.forEach(item => {
-    const bKey = item.bookedKey || item.key;
-    
-    // 1. Get Booked and Balance Values
-    const bookedVal = getValue(data.lockedAssignment, bKey);
-    const liveVal = getValue(data.liveYard, item.key);
-    
-    // 2. Determine Special Value
-    let specialVal = 0;
-    if (item.calcSpecial === 'INS_DIFF') {
-      // Custom Logic for Inspection: Balance - Booked
-      specialVal = liveVal - bookedVal;
-    } else if (data.liveYard && data.liveYard[item.specialKey] !== undefined && data.liveYard[item.specialKey] !== null) {
-      specialVal = data.liveYard[item.specialKey];
-    } else {
-      specialVal = getValue(data.lockedAssignment, item.specialKey);
-    }
+      let html = '';
+      items.forEach(item => {
+        const bKey = item.bookedKey || item.key;
+        
+        const bookedVal = getValue(data.lockedAssignment, bKey);
+        const liveVal = getValue(data.liveYard, item.key);
+        
+        let specialVal = 0;
+        if (item.calcSpecial === 'INS_DIFF') {
+          // Special Inspection = Balance - Booked
+          specialVal = liveVal - bookedVal;
+        } else if (data.liveYard && data.liveYard[item.specialKey] !== undefined && data.liveYard[item.specialKey] !== null) {
+          specialVal = data.liveYard[item.specialKey];
+        } else {
+          specialVal = getValue(data.lockedAssignment, item.specialKey);
+        }
 
-    html += `
-      <tr>
-        <td class="metric-name ps-3" style="color: #000000 !important;">
-          <i class="bi ${item.icon} me-2 text-primary"></i>${item.label}
-        </td>
-        <td><span class="metric-pill pill-booked">${bookedVal}</span></td>
-        <td><span class="metric-pill pill-special">${specialVal}</span></td>
-        <td><span class="metric-pill pill-balance">${liveVal}</span></td>
-      </tr>
-    `;
-  });
-  return html;
-}
+        html += `
+          <tr>
+            <td class="metric-name ps-3" style="color: #000000 !important;">
+              <i class="bi ${item.icon} me-2 text-primary"></i>${item.label}
+            </td>
+            <td><span class="metric-pill pill-booked">${bookedVal}</span></td>
+            <td><span class="metric-pill pill-special">${specialVal}</span></td>
+            <td><span class="metric-pill pill-balance">${liveVal}</span></td>
+          </tr>
+        `;
+      });
+      return html;
+    }
 
     function renderTomorrowRows(items) {
       let html = '';
@@ -437,5 +434,3 @@ async function loadDashboard() {
 loadDashboard();
 setInterval(loadDashboard, 30000);
 </script>
-</body>
-</html>
