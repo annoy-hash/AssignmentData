@@ -20,8 +20,6 @@
       max-width: 920px;
       margin: 0 auto;
       width: 100%;
-      padding-top: 24px !important;    /* GAP 1: Header to Title (Desktop) */
-      padding-bottom: 24px !important;
     }
 
     /* TOP NAV HEADER */
@@ -42,7 +40,7 @@
     /* SECTION TITLE WITH CLEAN UNDERLINE */
     .dashboard-title-wrapper {
       text-align: center;
-      margin-bottom: 24px !important;  /* GAP 2: Title to Date Bar (Desktop) */
+      margin-bottom: 1rem;
     }
 
     .dashboard-title {
@@ -59,7 +57,7 @@
       border: 1px solid #e2e8f0;
       border-radius: 8px;
       padding: 10px 16px;
-      margin-bottom: 8px !important;   /* Space between Date bar and Last Updated text */
+      margin-bottom: 6px;
     }
 
     .date-badge {
@@ -72,23 +70,18 @@
       display: inline-block;
     }
 
-    /* LAST UPDATED TIMESTAMP */
-    #lastUpdated {
-      margin-bottom: 24px !important;  /* GAP 3: Date/Timestamp to Today Card (Desktop) */
-    }
-
     /* CARDS LAYOUT */
     .dashboard-card {
       border: 0;
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       overflow: hidden;
-      margin-bottom: 24px !important;  /* GAP 4: Today Card to Tomorrow Card (Desktop) */
+      margin-bottom: 24px;
       background-color: #ffffff !important;
     }
 
     .dashboard-card:last-child {
-      margin-bottom: 0 !important;
+      margin-bottom: 12px;
     }
 
     /* BASE PILL STYLING */
@@ -123,7 +116,9 @@
       border: 1px solid #10b981;
     }
 
-    /* TABLE STYLING */
+    /* ----------------------------------------------------
+       TABLE STYLING (BLACK TEXT FOR BOTH TODAY & TOMORROW)
+       ---------------------------------------------------- */
     .table-today-theme,
     .table-tomorrow-theme {
       background-color: #ffffff !important;
@@ -210,13 +205,11 @@
       .dashboard-container {
         padding-left: 2px;
         padding-right: 2px;
-        padding-top: 18px !important;   /* GAP 1: Header to Title (Mobile) */
-        padding-bottom: 18px !important;
       }
 
       .dashboard-title-wrapper {
-        margin-top: 0;
-        margin-bottom: 18px !important; /* GAP 2: Title to Date Bar (Mobile) */
+        margin-top: 4px;
+        margin-bottom: 12px !important;
       }
 
       .dashboard-title {
@@ -225,17 +218,8 @@
         padding-bottom: 2px;
       }
 
-      .controls-bar {
-        padding: 8px 10px;
-        margin-bottom: 6px !important;
-      }
-
-      #lastUpdated {
-        margin-bottom: 18px !important; /* GAP 3: Date/Timestamp to Today Card (Mobile) */
-      }
-
       .dashboard-card {
-        margin-bottom: 18px !important; /* GAP 4: Today Card to Tomorrow Card (Mobile) */
+        margin-bottom: 16px;
       }
 
       .table thead th {
@@ -265,6 +249,11 @@
         border-radius: 12px;
       }
 
+      .controls-bar {
+        padding: 8px 10px;
+        margin-bottom: 6px;
+      }
+
       .date-badge {
         font-size: 0.78rem;
         padding: 4px 10px;
@@ -275,7 +264,7 @@
 <body>
 
 <!-- TOP NAV HEADER -->
-<div class="header-panel mb-0 shadow-sm">
+<div class="header-panel mb-3 shadow-sm">
   <div class="container-fluid d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center gap-2">
       <img src="rsgt_bangladesh_logo.png" alt="RSGT Logo" class="brand-logo" onerror="this.src='rsgt_bangladesh_logo.jpg';">
@@ -287,7 +276,7 @@
   </div>
 </div>
 
-<div class="container dashboard-container">
+<div class="container dashboard-container py-2">
 
   <!-- TITLE -->
   <div class="dashboard-title-wrapper">
@@ -302,8 +291,8 @@
     </div>
   </div>
   
-  <!-- LAST UPDATED TIMESTAMP OUTSIDE BAR -->
-  <div id="lastUpdated" class="small text-muted fw-semibold text-start ps-1">Last updated --/--/----, --:--:-- --</div>
+  <!-- LAST UPDATED OUTSIDE CONTROL BAR -->
+  <div id="lastUpdated" class="small text-muted fw-semibold text-start ps-1 mb-3">Last updated --/--/----, --:--:-- --</div>
 
   <!-- SECTION 1: TODAY -->
   <div class="card dashboard-card card-today">
@@ -377,6 +366,7 @@ async function loadDashboard() {
       { label: 'Inspection', icon: 'bi-search', key: 'Tomorrow_INS' }
     ];
 
+    // NUMERIC HELPER FUNCTION
     function getValue(obj, key) {
       if (!obj || obj[key] === undefined || obj[key] === null) {
         return 0;
@@ -395,6 +385,7 @@ async function loadDashboard() {
         
         let specialVal = 0;
         if (item.calcSpecial === 'INS_DIFF') {
+          // Explicit Math: Balance - Booked
           specialVal = Math.max(0, liveVal - bookedVal);
         } else if (data.liveYard && data.liveYard[item.specialKey] !== undefined && data.liveYard[item.specialKey] !== null) {
           specialVal = getValue(data.liveYard, item.specialKey);
