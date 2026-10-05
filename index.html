@@ -57,7 +57,7 @@
       border: 1px solid #e2e8f0;
       border-radius: 8px;
       padding: 10px 16px;
-      margin-bottom: 24px;
+      margin-bottom: 6px;
     }
 
     .date-badge {
@@ -251,7 +251,7 @@
 
       .controls-bar {
         padding: 8px 10px;
-        margin-bottom: 14px;
+        margin-bottom: 6px;
       }
 
       .date-badge {
@@ -284,16 +284,15 @@
   </div>
 
   <!-- CONTROL BAR -->
-  <div class="controls-bar shadow-sm d-flex justify-content-between align-items-center">
+  <div class="controls-bar shadow-sm d-flex align-items-center">
     <div class="d-flex align-items-center gap-2">
       <span class="small text-muted fw-bold">Date:</span>
       <span id="sectionDate" class="date-badge">--/--/----</span>
     </div>
-    <div>
-      <span id="lastUpdated" class="small text-muted fw-semibold"> Last updated --/--/----, --:--:-- --</span>
-    </div>
   </div>
   
+  <!-- LAST UPDATED OUTSIDE CONTROL BAR -->
+  <div id="lastUpdated" class="small text-muted fw-semibold text-start ps-1 mb-3">Last updated --/--/----, --:--:-- --</div>
 
   <!-- SECTION 1: TODAY -->
   <div class="card dashboard-card card-today">
@@ -350,7 +349,7 @@ async function loadDashboard() {
       const dt = new Date(data.latestTimestamp);
       const formattedDate = `${dt.getMonth() + 1}/${dt.getDate()}/${dt.getFullYear()}`;
       const formattedTime = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      document.getElementById('lastUpdated').innerText = `- Last updated ${formattedDate}, ${formattedTime}`;
+      document.getElementById('lastUpdated').innerText = `Last updated ${formattedDate}, ${formattedTime}`;
     }
 
     const todayList = [
