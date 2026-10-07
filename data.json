@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-07T09:52:17.025Z",
+  "updatedAt": "2026-10-07T09:52:33.371Z",
   "lockedTimestamp": "2026-10-07T02:31:54.000Z",
   "latestTimestamp": "2026-10-07T09:49:56.000Z",
   "lockedAssignment": {
@@ -21,7 +21,8 @@
     "Balance_CFS_To": 0,
     "Balance_INS_From": 0,
     "Balance_INS_To": 0,
-    "PCT1_Vessel": 0
+    "PCT1_Vessel": 0,
+    "PCT1_Status": 0
   },
   "liveYard": {
     "timestamp": "2026-10-07T09:49:56.000Z",
@@ -42,7 +43,8 @@
     "Balance_CFS_To": 0,
     "Balance_INS_From": 0,
     "Balance_INS_To": 0,
-    "PCT1_Vessel": 0
+    "PCT1_Vessel": 0,
+    "PCT1_Status": 0
   },
   "deliveredBalance": {
     "Today_CV": 18,
@@ -62,6 +64,7 @@
     "Balance_CFS_To": 0,
     "Balance_INS_From": 0,
     "Balance_INS_To": 0,
-    "PCT1_Vessel": 0
+    "PCT1_Vessel": 0,
+    "PCT1_Status": 0
   }
 }
