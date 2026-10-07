@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-07T05:57:55.193Z",
+  "updatedAt": "2026-10-07T05:58:08.182Z",
   "lockedTimestamp": "2026-10-07T02:31:54.000Z",
   "latestTimestamp": "2026-10-07T05:01:37.000Z",
   "lockedAssignment": {
@@ -19,7 +19,8 @@
     "Balance_CV_To": 0,
     "Balance_CFS_From": 0,
     "Balance_CFS_To": 0,
-    "Balance_INS_From": 0
+    "Balance_INS_From": 0,
+    "Balance_INS_To": 0
   },
   "liveYard": {
     "timestamp": "2026-10-07T05:01:37.000Z",
@@ -38,7 +39,8 @@
     "Balance_CV_To": 0,
     "Balance_CFS_From": 0,
     "Balance_CFS_To": 0,
-    "Balance_INS_From": 0
+    "Balance_INS_From": 0,
+    "Balance_INS_To": 0
   },
   "deliveredBalance": {
     "Today_CV": 0,
@@ -56,6 +58,7 @@
     "Balance_CV_To": 0,
     "Balance_CFS_From": 0,
     "Balance_CFS_To": 0,
-    "Balance_INS_From": 0
+    "Balance_INS_From": 0,
+    "Balance_INS_To": 0
   }
 }
