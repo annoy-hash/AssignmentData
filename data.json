@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-10-07T10:34:41.783Z",
+  "updatedAt": "2026-10-07T10:46:56.005Z",
   "lockedTimestamp": "2026-10-07T02:31:54.000Z",
-  "latestTimestamp": "2026-10-07T10:34:39.000Z",
+  "latestTimestamp": "2026-10-07T10:46:50.000Z",
   "lockedAssignment": {
     "timestamp": "2026-10-07T02:31:54.000Z",
     "Today_CV": 136,
@@ -29,14 +29,14 @@
     "PCT3_Status": 0
   },
   "liveYard": {
-    "timestamp": "2026-10-07T10:34:39.000Z",
+    "timestamp": "2026-10-07T10:46:50.000Z",
     "Today_CV": 116,
-    "Tomorrow_CV": 66,
+    "Tomorrow_CV": 67,
     "Today_INS": 29,
-    "Tomorrow_INS": 56,
-    "Today_OCD": 45,
-    "Tomorrow_OCD": 11,
-    "Today_Special_OCD": 21,
+    "Tomorrow_INS": 66,
+    "Today_OCD": 41,
+    "Tomorrow_OCD": 18,
+    "Today_Special_OCD": 23,
     "Today_Special_Reefer": 3,
     "Today_Special_CV": 0,
     "Today_Reefer_booked": 11,
