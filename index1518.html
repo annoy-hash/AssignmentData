@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSGT Bangladesh — Terminal Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    /* GLOBAL LAYOUT & TYPOGRAPHY */
+    body {
+      background-color: #e0f7fa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dashboard-container {
+      max-width: 920px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* TOP NAV HEADER */
+    .header-panel {
+      background-color: #002b49;
+      color: #ffffff;
+      border-radius: 0 0 8px 8px;
+      padding: 12px 20px;
+    }
+
+    .brand-logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* SECTION TITLE WITH CLEAN UNDERLINE */
+    .dashboard-title-wrapper {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    /* same font treatment as the card headers (heavy, uppercase, spaced) */
+    .dashboard-title {
+      color: #002b49;
+      display: inline-block;
+      border-bottom: 2px solid #002b49;
+      padding-bottom: 4px;
+      margin-bottom: 0;
+      font-size: 1.3rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* CONTROLS BAR: last updated (left) + alerts button (right) */
+    .controls-bar {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 16px;
+      margin-bottom: 16px;
+    }
+
+    .last-updated {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    /* on narrow phones the date/time drops to a second line as one piece */
+    .lu-time { white-space: nowrap; }
+
+    /* VESSEL ALERTS BUTTON (controls bar, right side) */
+    .alert-btn {
+      font-size: 0.78rem;
+      font-weight: 700;
+      border-radius: 20px;
+      padding: 5px 12px;
+      border: 1px solid #002b49;
+      color: #002b49;
+      background-color: #ffffff;
+      white-space: nowrap;
+    }
+    .alert-btn:hover { background-color: #e2e8f0; }
+    .alert-btn.on { background-color: #d1fae5; border-color: #10b981; color: #064e3b; }
+    .alert-btn.blocked { background-color: #e2e8f0; border-color: #cbd5e1; color: #64748b; }
+
+    /* FOOTER TIMESTAMP */
+    .footer-timestamp {
+      margin-top: auto;
+      padding: 15px 24px;
+      text-align: right;
+      color: #6c757d;
+      font-size: 0.75rem;
+    }
+
+    /* ----------------------------------------------------
+       TOP SUMMARY CARDS: Today / Tomorrow / Balance Positioning
+       Same frame as the berth cards (head bar + chip, 2px border)
+       ---------------------------------------------------- */
+    .top-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .info-card {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      background-color: #ffffff;
+      border: 2px solid #cbd5e1;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-head {
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+    }
+
+    /* header colours kept from the old tables */
+    .ic-today    .info-head { background-color: #0284c7; }
+    .ic-tomorrow .info-head { background-color: #002b49; }
+    .ic-balance  .info-head { background-color: #0b4a7d; }
+
+    .info-name {
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .info-chip {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      white-space: nowrap;
+    }
+
+    .info-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      padding-bottom: 4px;
+    }
+
+    /* one metric per row: label | value(s). --n = number of values, --w = value width */
+    .info-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) repeat(var(--n), var(--w));
+      column-gap: 6px;
+      align-items: center;
+      padding: 8px 10px 8px 12px;
+    }
+
+    .ic-today    { --n: 3; --w: 48px; }
+    .ic-today .info-row { column-gap: 4px; padding-left: 10px; padding-right: 8px; }
+    .ic-tomorrow { --n: 1; --w: 84px; }
+    .ic-balance  { --n: 1; --w: 84px; }
+
+    .info-rows {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+    }
+
+    .info-rows .info-row { flex: 1 1 auto; }
+    .info-rows .info-row + .info-row { border-top: 1px solid #e2e8f0; }
+    .info-rows .info-row:hover { background-color: #f1f5f9; }
+
+    .info-cols {
+      padding-top: 7px;
+      padding-bottom: 3px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .info-cols span {
+      font-size: 0.62rem;
+      white-space: nowrap;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #334155;
+      text-align: center;
+    }
+
+    .info-label {
+      font-weight: 800;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .info-label i { color: #0d6efd; margin-right: 6px; }
+
+    .info-val {
+      font-weight: 800;
+      font-size: 1.05rem;
+      text-align: center;
+      border-radius: 8px;
+      padding: 3px 0;
+      line-height: 1.3;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+    }
+
+    .ic-tomorrow .info-val,
+    .ic-balance  .info-val { font-size: 1.25rem; }
+
+    /* same value colours as before: grey = booked, amber = special, green = balance */
+    .v-booked  { background-color: #f1f5f9; color: #0f172a; border: 1px solid #94a3b8; }
+    .v-special { background-color: #fef3c7; color: #78350f; border: 1px solid #f59e0b; }
+    .v-balance { background-color: #d1fae5; color: #064e3b; border: 1px solid #10b981; }
+
+    .info-empty {
+      padding: 14px 12px;
+      color: #64748b;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    /* BERTH STATUS CARDS */
+    .berth-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px 16px;
+      margin-bottom: 24px;
+    }
+
+    /* Desktop: top cards share row 1 (equal height), next cards sit in row 2 */
+    .berth-grid > .berth-card {
+      grid-column: var(--col);
+      grid-row: var(--row);
+    }
+
+    .berth-grid > .berth-card.berth-next {
+      align-self: start;
+    }
+
+    /* keep Import/Export at the bottom so rows line up across cards */
+    .berth-card .berth-metrics {
+      margin-top: auto;
+    }
+
+    .berth-card.st-empty .berth-vessel {
+      flex: 1 1 auto;
+    }
+
+    .berth-next .berth-head {
+      background-color: #334155;
+      padding: 6px 12px;
+    }
+
+    .berth-next .berth-name {
+      font-size: 0.9rem;
+    }
+
+    .berth-next .berth-vessel {
+      font-size: 1rem;
+      min-height: 0;
+      padding-top: 10px;
+    }
+
+    .berth-card {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      background-color: #f1f5f9;
+      border: 2px solid #cbd5e1;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .berth-head {
+      background-color: #002b49;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+    }
+
+    .berth-name {
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+    }
+
+    .berth-status {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background-color: #e2e8f0;
+      color: #334155;
+    }
+
+    .berth-vessel {
+      text-align: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      padding: 12px 10px 10px;
+      line-height: 1.25;
+      min-height: 2.6em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .berth-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      text-align: center;
+      padding: 4px 8px 14px;
+    }
+
+    .bm-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: #334155;
+    }
+
+    .bm-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .bm-export {
+      border-left: 2px solid rgba(15, 23, 42, 0.25);
+    }
+
+    .berth-card.st-working  { background-color: #fef3c7; border-color: #f59e0b; }
+    .berth-card.st-complete { background-color: #d1fae5; border-color: #10b981; }
+    .berth-card.st-inbound  { background-color: #fee2e2; border-color: #f87171; }
+
+    .st-working  .berth-status { background-color: #fcd34d; color: #78350f; }
+    .st-complete .berth-status { background-color: #6ee7b7; color: #064e3b; }
+    .st-inbound  .berth-status { background-color: #fca5a5; color: #7f1d1d; }
+
+    .berth-eta {
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #7f1d1d;
+      margin-top: -6px;
+      padding-bottom: 10px;
+    }
+
+    .berth-card.st-empty .berth-vessel {
+      color: #64748b;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-transform: none;
+    }
+
+    /* TABLET: Today full width, Tomorrow + Balance side by side */
+    @media (max-width: 899.98px) {
+      .top-grid { grid-template-columns: 1fr 1fr; }
+      .top-grid .ic-today { grid-column: 1 / -1; --w: 76px; }
+    }
+
+    /* MOBILE OPTIMIZATION */
+    @media (max-width: 576px) {
+      body {
+        padding: 0 4px;
+      }
+
+      .dashboard-container {
+        padding-left: 2px;
+        padding-right: 2px;
+      }
+
+      .dashboard-title-wrapper {
+        margin-top: 4px;
+        margin-bottom: 12px !important;
+      }
+
+      .dashboard-title {
+        font-size: 1rem !important;
+        border-bottom-width: 2px;
+        padding-bottom: 2px;
+      }
+
+      .controls-bar {
+        padding: 7px 10px;
+        margin-bottom: 12px;
+      }
+
+      .last-updated {
+        font-size: 0.74rem;
+      }
+
+      .alert-btn {
+        font-size: 0.72rem;
+        padding: 4px 10px;
+      }
+
+      .top-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .top-grid .ic-today { --w: 58px; }
+
+      .berth-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .berth-grid > .berth-card {
+        grid-column: auto;
+        grid-row: auto;
+      }
+
+      .berth-vessel {
+        min-height: 0;
+        font-size: 1rem;
+      }
+
+      .bm-val {
+        font-size: 1.35rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV HEADER -->
+<div class="header-panel mb-3 shadow-sm">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-2">
+      <img src="rsgt_bangladesh_logo.png" alt="RSGT Logo" class="brand-logo" onerror="this.onerror=null;this.src='rsgt_bangladesh_logo.jpg';">
+      <div>
+        <h5 class="fw-bold mb-0 text-white">RSGT Bangladesh</h5>
+        <div class="fw-semibold text-white-50 extra-small">Terminal Dashboard</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container dashboard-container py-2">
+
+  <!-- TITLE -->
+  <div class="dashboard-title-wrapper">
+    <h4 class="dashboard-title">Delivery Detail and Berth Information</h4>
+  </div>
+
+  <!-- CONTROL BAR: last updated + vessel alerts button -->
+  <div class="controls-bar shadow-sm d-flex align-items-center justify-content-between gap-2">
+    <span class="last-updated">Last updated <span id="lastUpdated" class="lu-time">--/--/----, --:--:-- --</span></span>
+    <button id="alertBtn" type="button" class="alert-btn d-none" onclick="enableAlerts()">
+      <i class="bi bi-bell me-1"></i>Vessel alerts
+    </button>
+  </div>
+
+  <!-- SECTION 1-3: TODAY / TOMORROW / BALANCE POSITIONING -->
+  <div class="top-grid">
+
+    <div class="info-card ic-today">
+      <div class="info-head">
+        <span class="info-name">Today</span>
+        <span class="info-chip" id="todayChip">--</span>
+      </div>
+      <div class="info-body">
+        <div class="info-row info-cols"><span></span><span>Booked</span><span>Special</span><span>Balance</span></div>
+        <div class="info-rows" id="todayKpiRows"><div class="info-empty">Loading...</div></div>
+      </div>
+    </div>
+
+    <div class="info-card ic-tomorrow">
+      <div class="info-head">
+        <span class="info-name">Tomorrow</span>
+        <span class="info-chip" id="tomorrowChip">--</span>
+      </div>
+      <div class="info-body">
+        <div class="info-row info-cols"><span></span><span>Booked</span></div>
+        <div class="info-rows" id="tomorrowKpiRows"><div class="info-empty">Loading...</div></div>
+      </div>
+    </div>
+
+    <div class="info-card ic-balance">
+      <div class="info-head">
+        <span class="info-name">Balance Positioning</span>
+      </div>
+      <div class="info-body">
+        <div class="info-rows" id="balanceRows"><div class="info-empty">Loading...</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SECTION 4: BERTH STATUS -->
+  <div class="berth-grid" id="berthGrid">
+    <div class="berth-card st-empty" style="--col:1;--row:1"><div class="berth-head"><span class="berth-name">PCT-1</span></div><div class="berth-vessel">Loading...</div></div>
+    <div class="berth-card st-empty" style="--col:2;--row:1"><div class="berth-head"><span class="berth-name">PCT-2</span></div><div class="berth-vessel">Loading...</div></div>
+    <div class="berth-card st-empty" style="--col:3;--row:1"><div class="berth-head"><span class="berth-name">PCT-3</span></div><div class="berth-vessel">Loading...</div></div>
+  </div>
+
+</div>
+
+<script>
+const TZ = 'Asia/Dhaka';
+
+function fmtDate(d) {
+  return d.toLocaleDateString('en-US', { timeZone: TZ });   // M/D/YYYY
+}
+function fmtTime(d) {
+  return d.toLocaleTimeString('en-US', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+function fmtChip(d) {
+  return d.toLocaleDateString('en-GB', { timeZone: TZ, weekday: 'short', day: '2-digit', month: 'short' });   // Thu 08 Oct
+}
+
+function setSectionDate() {
+  const now = new Date();
+  document.getElementById('todayChip').innerText = fmtChip(now);
+  document.getElementById('tomorrowChip').innerText = fmtChip(new Date(now.getTime() + 864e5));
+}
+setSectionDate();
+
+// Keys must match the sheet headers exactly (Apps Script passes every column by header name)
+const todayList = [
+  { label: 'CV', icon: 'bi-truck', key: 'Today_CV', specialKey: 'Today_Special_CV' },
+  { label: 'OCD', icon: 'bi-box-seam', key: 'Today_OCD', specialKey: 'Today_Special_OCD' },
+  { label: 'Reefer', icon: 'bi-snow', key: 'Today_Reefer_booked', specialKey: 'Today_Special_Reefer' },
+  { label: 'Inspection', icon: 'bi-search', key: 'Today_INS', calcSpecial: 'INS_DIFF' }
+];
+
+const tomorrowList = [
+  { label: 'CV', icon: 'bi-truck', key: 'Tomorrow_CV' },
+  { label: 'OCD', icon: 'bi-box-seam', key: 'Tomorrow_OCD' },
+  { label: 'Reefer', icon: 'bi-snow', key: 'Tomorrow_Reefer' },
+  { label: 'Inspection', icon: 'bi-search', key: 'Tomorrow_INS' }
+];
+
+// Berth cards (vessel name + status are text columns in the sheet)
+const berthList = [
+  { berth: 'PCT-1', key: 'PCT1' },
+  { berth: 'PCT-2', key: 'PCT2' },
+  { berth: 'PCT-3', key: 'PCT3' }
+];
+
+// Balance Positioning card (live values from the latest sheet row)
+// "To" values (toKey) stay in data.json but are not shown
+const balanceList = [
+  { label: 'CV',         icon: 'bi-truck',  fromKey: 'Balance_CV_From',  toKey: 'Balance_CV_To' },
+  { label: 'CFS',        icon: 'bi-boxes',  fromKey: 'Balance_CFS_From', toKey: 'Balance_CFS_To' },
+  { label: 'Inspection', icon: 'bi-search', fromKey: 'Balance_INS_From', toKey: 'Balance_INS_To' }
+];
+
+// Case-insensitive key lookup
+function findKey(obj, key) {
+  if (!obj) return undefined;
+  if (Object.prototype.hasOwnProperty.call(obj, key)) return key;
+  const lower = key.toLowerCase();
+  return Object.keys(obj).find(k => k.toLowerCase() === lower);
+}
+
+function hasValue(obj, key) {
+  const k = findKey(obj, key);
+  return k !== undefined && obj[k] !== null;
+}
+
+// NUMERIC HELPER FUNCTION
+function getValue(obj, key) {
+  if (!hasValue(obj, key)) return 0;
+  const parsed = parseInt(obj[findKey(obj, key)], 10);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+// One card row: label on the left, value boxes on the right
+function infoRowHtml(item, values) {
+  return `
+        <div class="info-row">
+          <span class="info-label"><i class="bi ${item.icon}"></i>${item.label}</span>
+          ${values.map(v => `<span class="info-val ${v.cls}">${v.val}</span>`).join('')}
+        </div>`;
+}
+
+function renderTodayRows(data, items) {
+  return items.map(item => {
+    const bKey = item.bookedKey || item.key;
+
+    const bookedVal = getValue(data.lockedAssignment, bKey);
+    const liveVal = getValue(data.liveYard, item.key);
+
+    let specialVal = 0;
+    if (item.calcSpecial === 'INS_DIFF') {
+      // Explicit Math: Balance - Booked
+      specialVal = Math.max(0, liveVal - bookedVal);
+    } else if (hasValue(data.liveYard, item.specialKey)) {
+      specialVal = getValue(data.liveYard, item.specialKey);
+    } else {
+      specialVal = getValue(data.lockedAssignment, item.specialKey);
+    }
+
+    return infoRowHtml(item, [
+      { cls: 'v-booked',  val: bookedVal },
+      { cls: 'v-special', val: specialVal },
+      { cls: 'v-balance', val: liveVal }
+    ]);
+  }).join('');
+}
+
+function renderTomorrowRows(data, items) {
+  return items.map(item =>
+    infoRowHtml(item, [{ cls: 'v-balance', val: getValue(data.liveYard, item.key) }])
+  ).join('');
+}
+
+// Shows "–" until the key exists in data.json
+function showValue(obj, key) {
+  return hasValue(obj, key) ? getValue(obj, key) : '–';
+}
+
+function renderBalanceRows(data, items) {
+  return items.map(item =>
+    infoRowHtml(item, [{ cls: 'v-booked', val: showValue(data.liveYard, item.fromKey) }])
+  ).join('');
+}
+
+function getText(obj, key) {
+  const k = findKey(obj, key);
+  if (k === undefined || obj[k] === null) return '';
+  const v = String(obj[k]).trim();
+  return v === '0' ? '' : v;
+}
+
+// N4 visit phase -> card colour
+function berthStatus(raw) {
+  const s = String(raw || '').toUpperCase();
+  if (s.includes('WORKING')) return { cls: 'st-working', label: 'Working' };
+  if (s.includes('COMPLETE')) return { cls: 'st-complete', label: 'Completed' };
+  if (s.includes('INBOUND')) return { cls: 'st-inbound', label: 'Inbound', showEta: true };
+  if (s.includes('ARRIVED')) return { cls: 'st-inbound', label: 'Arrived' };
+  return null;
+}
+
+// ETA arrives as "2026-10-08 07:30" (Dhaka time) or as an ISO date from Apps Script
+function formatEta(raw) {
+  if (!raw) return '';
+  let s = String(raw).trim();
+  if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2})?$/.test(s)) s = s.replace(' ', 'T') + '+06:00';
+  const d = new Date(s);
+  if (isNaN(d)) return String(raw).replace(/</g, '&lt;');
+  return d.toLocaleString('en-GB', {
+    timeZone: TZ, weekday: 'short', day: '2-digit', month: 'short',
+    hour: '2-digit', minute: '2-digit', hour12: false
+  });
+}
+
+function berthCardHtml(title, vessel, status, eta, metrics, isNext, col) {
+  return `
+      <div class="berth-card ${status ? status.cls : ''}${isNext ? ' berth-next' : ''}" style="--col:${col};--row:${isNext ? 2 : 1}">
+        <div class="berth-head">
+          <span class="berth-name">${title}</span>
+          ${status ? `<span class="berth-status">${status.label}</span>` : ''}
+        </div>
+        <div class="berth-vessel">${vessel.replace(/</g, '&lt;')}</div>
+        ${eta ? `<div class="berth-eta"><i class="bi bi-clock me-1"></i>ETA ${eta}</div>` : ''}
+        ${metrics ? `
+        <div class="berth-metrics">
+          <div><div class="bm-label">Import (Yard)</div><div class="bm-val">${metrics.imp}</div></div>
+          <div class="bm-export"><div class="bm-label">Export (Yard)</div><div class="bm-val">${metrics.exp}</div></div>
+        </div>` : ''}
+      </div>`;
+}
+
+// Import/Export row only appears once those columns exist in the sheet
+function berthMetrics(y, prefix) {
+  if (!hasValue(y, prefix + '_Import') && !hasValue(y, prefix + '_Export')) return null;
+  return { imp: showValue(y, prefix + '_Import'), exp: showValue(y, prefix + '_Export') };
+}
+
+// Per berth: top card (vessel alongside, else first Inbound) + optional next card
+function renderBerthCards(data, items) {
+  const y = data.liveYard;
+  return items.map((item, idx) => {
+    const col = idx + 1;
+    const vessel = getText(y, item.key + '_Vessel');
+    if (!vessel) {
+      return `
+      <div class="berth-card st-empty" style="--col:${col};--row:1">
+        <div class="berth-head"><span class="berth-name">${item.berth}</span></div>
+        <div class="berth-vessel">No vessel at berth</div>
+      </div>`;
+    }
+    const status = berthStatus(getText(y, item.key + '_Status'));
+    const eta = status && status.showEta ? formatEta(getText(y, item.key + '_ETA')) : '';
+    let html = berthCardHtml(item.berth, vessel, status, eta, berthMetrics(y, item.key), false, col);
+
+    const nextVessel = getText(y, item.key + '_Next_Vessel');
+    if (nextVessel) {
+      // PCTn_Next_Status is optional: blank / missing = Inbound
+      const nextStatus = berthStatus(getText(y, item.key + '_Next_Status') || 'INBOUND');
+      const nextEta = nextStatus.showEta ? formatEta(getText(y, item.key + '_Next_ETA')) : '';
+      html += berthCardHtml(item.berth + ' · Next', nextVessel, nextStatus, nextEta, berthMetrics(y, item.key + '_Next'), true, col);
+    }
+    return html;
+  }).join('');
+}
+
+/* ----------------------------------------------------
+   VESSEL ALERTS
+   A browser notification fires when a berth vessel:
+   - ARRIVES:   INBOUND -> ARRIVED (or straight to WORKING if ARRIVED was missed between refreshes)
+   - COMPLETES: INBOUND / ARRIVED / WORKING -> COMPLETE
+   - Only while this page is open in a tab (background tab is fine)
+   - Each viewer clicks "Vessel alerts" once to allow notifications
+   - sw.js (same folder) is needed for Android Chrome; desktop works without it
+   ---------------------------------------------------- */
+const ALERT_MEMORY_KEY = 'berthPhaseMemory';
+const MEMORY_FRESH_MS = 30 * 60 * 1000;      // older memory (page was closed) -> re-seed silently
+const MEMORY_KEEP_MS = 3 * 24 * 3600 * 1000; // forget vessels not seen for 3 days
+let swReg = null;
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(() => navigator.serviceWorker.ready)
+    .then(reg => { swReg = reg; })
+    .catch(() => { /* no sw.js: desktop falls back to new Notification() */ });
+}
+
+function phaseRank(raw) {
+  const s = String(raw || '').toUpperCase();
+  if (s.includes('INBOUND')) return 20;
+  if (s.includes('ARRIVED')) return 30;
+  if (s.includes('WORKING')) return 40;
+  if (s.includes('COMPLETE')) return 50;
+  return 0;
+}
+
+// Every vessel currently on the berth cards with its phase
+function currentVessels(y) {
+  const list = [];
+  berthList.forEach(b => {
+    const top = getText(y, b.key + '_Vessel');
+    if (top) list.push({ name: top, berth: b.berth, rank: phaseRank(getText(y, b.key + '_Status')) });
+    const next = getText(y, b.key + '_Next_Vessel');
+    if (next) list.push({ name: next, berth: b.berth, rank: phaseRank(getText(y, b.key + '_Next_Status') || 'INBOUND') });
+  });
+  return list;
+}
+
+function loadMemory() {
+  try { return JSON.parse(localStorage.getItem(ALERT_MEMORY_KEY)) || null; } catch (e) { return null; }
+}
+function saveMemory(mem) {
+  try { localStorage.setItem(ALERT_MEMORY_KEY, JSON.stringify(mem)); } catch (e) { /* storage blocked */ }
+}
+
+// Compares each vessel's phase with the last refresh and alerts on a change
+function checkVesselAlerts(data) {
+  const now = Date.now();
+  const mem = loadMemory();
+  const fresh = !!(mem && mem.vessels && now - mem.savedAt < MEMORY_FRESH_MS);
+  const prev = fresh ? mem.vessels : {};
+  const keep = {};
+
+  Object.keys(prev).forEach(n => { if (now - prev[n].seen < MEMORY_KEEP_MS) keep[n] = prev[n]; });
+
+  currentVessels(data.liveYard).forEach(v => {
+    const key = v.name.toUpperCase();
+    const before = prev[key];
+    if (before) {
+      if (before.rank === 20 && (v.rank === 30 || v.rank === 40)) notifyArrival(v);
+      if (before.rank >= 20 && before.rank <= 40 && v.rank === 50) notifyComplete(v);
+    }
+    keep[key] = { rank: v.rank, seen: now };
+  });
+
+  saveMemory({ savedAt: now, vessels: keep });
+}
+
+function showNotice(title, body, tag) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const opts = { body: body, tag: tag, requireInteraction: true };
+  const fallback = () => {
+    try {
+      const n = new Notification(title, opts);
+      n.onclick = () => { window.focus(); n.close(); };
+    } catch (e) { console.warn('Notification failed:', e); }
+  };
+  if (swReg && swReg.showNotification) swReg.showNotification(title, opts).catch(fallback);
+  else fallback();
+}
+
+function notifyArrival(v) {
+  const verb = v.rank === 40 ? 'has arrived and started working' : 'has arrived';
+  showNotice('Vessel arrived — ' + v.berth, v.name + ' ' + verb + ' at ' + v.berth + '.', 'arrival-' + v.name.toUpperCase());
+}
+
+function notifyComplete(v) {
+  showNotice('Vessel completed — ' + v.berth, v.name + ' has completed work at ' + v.berth + '.', 'complete-' + v.name.toUpperCase());
+}
+
+function updateAlertBtn() {
+  const btn = document.getElementById('alertBtn');
+  if (!('Notification' in window)) { btn.classList.add('d-none'); return; }   // e.g. iPhone Safari
+  btn.classList.remove('d-none', 'on', 'blocked');
+  const p = Notification.permission;
+  if (p === 'granted') {
+    btn.classList.add('on');
+    btn.innerHTML = '<i class="bi bi-bell-fill me-1"></i>Alerts on';
+    btn.title = 'Vessel alerts are on for this browser. Click to send a test alert.';
+  } else if (p === 'denied') {
+    btn.classList.add('blocked');
+    btn.innerHTML = '<i class="bi bi-bell-slash me-1"></i>Alerts blocked';
+    btn.title = 'Notifications are blocked. Allow them for this site in the browser settings (padlock icon in the address bar).';
+  } else {
+    btn.innerHTML = '<i class="bi bi-bell me-1"></i>Vessel alerts';
+    btn.title = 'Get a notification when a vessel arrives or completes work';
+  }
+}
+
+async function enableAlerts() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    const result = await Notification.requestPermission();
+    updateAlertBtn();
+    if (result === 'granted') showNotice('Vessel alerts on', 'You will get a notification here when a vessel arrives or completes work.', 'alerts-test');
+  } else if (Notification.permission === 'granted') {
+    showNotice('Test alert', 'Vessel alerts are working in this browser.', 'alerts-test');
+  }
+  updateAlertBtn();
+}
+updateAlertBtn();
+
+async function loadDashboard() {
+  try {
+    setSectionDate();
+
+    const response = await fetch('data.json?cacheBust=' + Date.now(), { cache: 'no-store' });
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const data = await response.json();
+
+    if (data.latestTimestamp) {
+      const dt = new Date(data.latestTimestamp);
+      if (!isNaN(dt)) {
+        document.getElementById('lastUpdated').innerText = `${fmtDate(dt)}, ${fmtTime(dt)}`;
+      }
+    }
+
+    document.getElementById('todayKpiRows').innerHTML = renderTodayRows(data, todayList);
+    document.getElementById('tomorrowKpiRows').innerHTML = renderTomorrowRows(data, tomorrowList);
+    document.getElementById('balanceRows').innerHTML = renderBalanceRows(data, balanceList);
+    document.getElementById('berthGrid').innerHTML = renderBerthCards(data, berthList);
+
+    checkVesselAlerts(data);
+
+  } catch (err) {
+    console.error('Failed to load data.json:', err);
+  }
+}
+
+loadDashboard();
+setInterval(loadDashboard, 30000);
+</script>
+</body>
+</html>
