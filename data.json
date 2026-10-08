@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-10-08T06:09:53.843Z",
+  "updatedAt": "2026-10-08T06:09:58.076Z",
   "lockedTimestamp": "2026-10-07T19:46:41.000Z",
-  "latestTimestamp": "2026-10-08T06:09:51.000Z",
+  "latestTimestamp": "2026-10-08T06:09:55.000Z",
   "lockedAssignment": {
     "timestamp": "2026-10-07T19:46:41.000Z",
     "Today_CV": 122,
@@ -29,7 +29,7 @@
     "PCT3_Status": 0
   },
   "liveYard": {
-    "timestamp": "2026-10-08T06:09:51.000Z",
+    "timestamp": "2026-10-08T06:09:55.000Z",
     "Today_CV": 124,
     "Tomorrow_CV": 29,
     "Today_INS": 89,
