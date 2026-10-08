@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSGT Bangladesh — Terminal Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    /* GLOBAL LAYOUT & TYPOGRAPHY */
+    body { 
+      background-color: #e0f7fa; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .dashboard-container {
+      max-width: 920px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* TOP NAV HEADER */
+    .header-panel { 
+      background-color: #002b49; 
+      color: #ffffff; 
+      border-radius: 0 0 8px 8px; 
+      padding: 12px 20px;
+    }
+    
+    .brand-logo {
+      height: 48px; 
+      width: auto; 
+      object-fit: contain;
+      display: block;
+    }
+
+    /* SECTION TITLE WITH CLEAN UNDERLINE */
+    .dashboard-title-wrapper {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .dashboard-title {
+      color: #002b49;
+      display: inline-block;
+      border-bottom: 2px solid #002b49;
+      padding-bottom: 4px;
+      margin-bottom: 0;
+    }
+
+    /* CONTROLS BAR */
+    .controls-bar {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin-bottom: 6px;
+    }
+
+    .date-badge {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #002b49;
+      background-color: #e2e8f0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+
+    /* CARDS LAYOUT */
+    .dashboard-card {
+      border: 0;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      margin-bottom: 24px;
+      background-color: #ffffff !important;
+    }
+
+    .dashboard-card:last-child {
+      margin-bottom: 12px;
+    }
+
+    /* BASE PILL STYLING */
+    .metric-pill {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 1.05rem;
+      font-weight: 800;
+      padding: 6px 16px;
+      border-radius: 20px;
+      display: inline-block;
+      min-width: 75px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    }
+
+    /* COLUMN-SPECIFIC HIGH CONTRAST ACCENTS */
+    .pill-booked {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+      border: 1px solid #94a3b8;
+    }
+
+    .pill-special {
+      background-color: #fef3c7 !important;
+      color: #78350f !important;
+      border: 1px solid #f59e0b;
+    }
+
+    .pill-balance {
+      background-color: #d1fae5 !important;
+      color: #064e3b !important;
+      border: 1px solid #10b981;
+    }
+
+    /* ----------------------------------------------------
+       TABLE STYLING (BLACK TEXT FOR BOTH TODAY & TOMORROW)
+       ---------------------------------------------------- */
+    .table-today-theme,
+    .table-tomorrow-theme,
+    .table-balance-theme {
+      background-color: #ffffff !important;
+      color: #000000 !important;
+      margin-bottom: 0;
+    }
+
+    /* HEADER STYLING */
+    .table-today-theme thead th { 
+      background-color: #0284c7 !important;
+      color: #ffffff !important; 
+      font-weight: 700; 
+      text-align: center; 
+      vertical-align: middle;
+      font-size: 0.95rem;
+      padding: 12px 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: none;
+      white-space: nowrap;
+    }
+
+    .table-tomorrow-theme thead th { 
+      background-color: #002b49 !important;
+      color: #ffffff !important; 
+      font-weight: 700; 
+      text-align: center; 
+      vertical-align: middle;
+      font-size: 0.95rem;
+      padding: 12px 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: none;
+      white-space: nowrap;
+    }
+
+    .table-today-theme thead th.section-header-title,
+    .table-tomorrow-theme thead th.section-header-title,
+    .table-balance-theme thead th.section-header-title {
+      text-align: left;
+    }
+
+    /* FORCE METRIC NAME LABELS TO BLACK */
+    .table-today-theme td.metric-name,
+    .table-tomorrow-theme td.metric-name,
+    .table-balance-theme td.metric-name { 
+      text-align: left !important; 
+      font-weight: 800 !important; 
+      font-size: 1.05rem !important;
+      color: #000000 !important; 
+      white-space: nowrap !important;
+      opacity: 1 !important;
+    }
+
+    .table-today-theme td,
+    .table-tomorrow-theme td,
+    .table-balance-theme td { 
+      text-align: center; 
+      vertical-align: middle; 
+      padding: 12px 14px;
+      border-color: #e2e8f0 !important;
+      color: #000000 !important;
+    }
+
+    /* TABLE ROW HOVER HIGHLIGHT */
+    .table-today-theme tbody tr:hover,
+    .table-tomorrow-theme tbody tr:hover,
+    .table-balance-theme tbody tr:hover {
+      background-color: #f1f5f9 !important;
+      transition: background-color 0.15s ease-in-out;
+    }
+
+    /* FOOTER TIMESTAMP */
+    .footer-timestamp {
+      margin-top: auto;
+      padding: 15px 24px;
+      text-align: right;
+      color: #6c757d;
+      font-size: 0.75rem;
+    }
+
+    /* BALANCE POSITIONING TABLE (same style as Today / Tomorrow) */
+    .table-balance-theme thead th { 
+      background-color: #0b4a7d !important;
+      color: #ffffff !important; 
+      font-weight: 700; 
+      text-align: center; 
+      vertical-align: middle;
+      font-size: 0.95rem;
+      padding: 12px 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border: none;
+      white-space: nowrap;
+    }
+
+    /* BERTH STATUS CARDS */
+    .berth-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px 16px;
+      margin-bottom: 24px;
+    }
+
+    /* Desktop: top cards share row 1 (equal height), next cards sit in row 2 */
+    .berth-grid > .berth-card {
+      grid-column: var(--col);
+      grid-row: var(--row);
+    }
+
+    .berth-grid > .berth-card.berth-next {
+      align-self: start;
+    }
+
+    /* keep Import/Export at the bottom so rows line up across cards */
+    .berth-card .berth-metrics {
+      margin-top: auto;
+    }
+
+    .berth-card.st-empty .berth-vessel {
+      flex: 1 1 auto;
+    }
+
+    .berth-next .berth-head {
+      background-color: #334155;
+      padding: 6px 12px;
+    }
+
+    .berth-next .berth-name {
+      font-size: 0.9rem;
+    }
+
+    .berth-next .berth-vessel {
+      font-size: 1rem;
+      min-height: 0;
+      padding-top: 10px;
+    }
+
+    .berth-card {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      background-color: #f1f5f9;
+      border: 2px solid #cbd5e1;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .berth-head {
+      background-color: #002b49;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+    }
+
+    .berth-name {
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+    }
+
+    .berth-status {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background-color: #e2e8f0;
+      color: #334155;
+    }
+
+    .berth-vessel {
+      text-align: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      padding: 12px 10px 10px;
+      line-height: 1.25;
+      min-height: 2.6em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .berth-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      text-align: center;
+      padding: 4px 8px 14px;
+    }
+
+    .bm-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: #334155;
+    }
+
+    .bm-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .bm-export {
+      border-left: 2px solid rgba(15, 23, 42, 0.25);
+    }
+
+    .berth-card.st-working  { background-color: #fef3c7; border-color: #f59e0b; }
+    .berth-card.st-complete { background-color: #d1fae5; border-color: #10b981; }
+    .berth-card.st-inbound  { background-color: #fee2e2; border-color: #f87171; }
+
+    .st-working  .berth-status { background-color: #fcd34d; color: #78350f; }
+    .st-complete .berth-status { background-color: #6ee7b7; color: #064e3b; }
+    .st-inbound  .berth-status { background-color: #fca5a5; color: #7f1d1d; }
+
+    .berth-eta {
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #7f1d1d;
+      margin-top: -6px;
+      padding-bottom: 10px;
+    }
+
+    .berth-card.st-empty .berth-vessel {
+      color: #64748b;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-transform: none;
+    }
+
+    /* MOBILE OPTIMIZATION */
+    @media (max-width: 576px) {
+      body {
+        padding: 0 4px;
+      }
+
+      .dashboard-container {
+        padding-left: 2px;
+        padding-right: 2px;
+      }
+
+      .dashboard-title-wrapper {
+        margin-top: 4px;
+        margin-bottom: 12px !important;
+      }
+
+      .dashboard-title {
+        font-size: 1.15rem !important;
+        border-bottom-width: 2px;
+        padding-bottom: 2px;
+      }
+
+      .dashboard-card {
+        margin-bottom: 16px;
+      }
+
+      .table thead th {
+        font-size: 0.75rem !important;
+        padding: 8px 3px !important;
+        letter-spacing: 0;
+      }
+
+      .table td {
+        padding: 8px 2px !important;
+      }
+
+      .table td.metric-name {
+        font-size: 0.82rem !important;
+        padding-left: 6px !important;
+      }
+
+      .table td.metric-name i {
+        margin-right: 4px !important;
+        font-size: 0.85rem;
+      }
+
+      .metric-pill {
+        min-width: 42px;
+        padding: 3px 6px;
+        font-size: 0.8rem;
+        border-radius: 12px;
+      }
+
+      .controls-bar {
+        padding: 8px 10px;
+        margin-bottom: 6px;
+      }
+
+      .date-badge {
+        font-size: 0.78rem;
+        padding: 4px 10px;
+      }
+
+      .table-balance-theme thead th.section-header-title {
+        white-space: normal;
+        line-height: 1.2;
+      }
+
+      .berth-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .berth-grid > .berth-card {
+        grid-column: auto;
+        grid-row: auto;
+      }
+
+      .berth-vessel {
+        min-height: 0;
+        font-size: 1rem;
+      }
+
+      .bm-val {
+        font-size: 1.35rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV HEADER -->
+<div class="header-panel mb-3 shadow-sm">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-2">
+      <img src="rsgt_bangladesh_logo.png" alt="RSGT Logo" class="brand-logo" onerror="this.onerror=null;this.src='rsgt_bangladesh_logo.jpg';">
+      <div>
+        <h5 class="fw-bold mb-0 text-white">RSGT Bangladesh</h5>
+        <div class="fw-semibold text-white-50 extra-small">Terminal Dashboard</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container dashboard-container py-2">
+
+  <!-- TITLE -->
+  <div class="dashboard-title-wrapper">
+    <h4 class="fw-bold dashboard-title">One Stop Booking Breakdown</h4>
+  </div>
+
+  <!-- CONTROL BAR -->
+  <div class="controls-bar shadow-sm d-flex align-items-center">
+    <div class="d-flex align-items-center gap-2">
+      <span class="small text-muted fw-bold">Date:</span>
+      <span id="sectionDate" class="date-badge">--/--/----</span>
+    </div>
+  </div>
+  
+  <!-- LAST UPDATED OUTSIDE CONTROL BAR -->
+  <div id="lastUpdated" class="small text-muted fw-semibold text-start ps-1 mb-3">Last updated --/--/----, --:--:-- --</div>
+
+  <!-- SECTION 1: TODAY -->
+  <div class="card dashboard-card card-today">
+    <div class="table-responsive">
+      <table class="table table-today-theme align-middle mb-0">
+        <thead>
+          <tr>
+            <th class="section-header-title ps-3" style="width: 31%;">Today</th>
+            <th style="width: 23%;">Booked</th>
+            <th style="width: 23%;">Special</th>
+            <th style="width: 23%;">Balance</th>
+          </tr>
+        </thead>
+        <tbody id="todayKpiRows">
+          <tr><td colspan="4" class="py-3 text-black">Loading Today's Assignment...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 2: TOMORROW -->
+  <div class="card dashboard-card card-tomorrow">
+    <div class="table-responsive">
+      <table class="table table-tomorrow-theme align-middle mb-0">
+        <thead>
+          <tr>
+            <th class="section-header-title ps-3" style="width: 31%;">Tomorrow</th>
+            <th style="width: 69%;">Booked</th>
+          </tr>
+        </thead>
+        <tbody id="tomorrowKpiRows">
+          <tr><td colspan="2" class="py-3 text-black">Loading Tomorrow's Assignment...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 3: BALANCE POSITIONING -->
+  <div class="card dashboard-card card-balance">
+    <div class="table-responsive">
+      <table class="table table-balance-theme align-middle mb-0">
+        <thead>
+          <tr>
+            <th class="section-header-title ps-3" style="width: 31%;">Balance Positioning</th>
+            <th style="width: 69%;"></th>
+          </tr>
+        </thead>
+        <tbody id="balanceRows">
+          <tr><td colspan="2" class="py-3 text-black">Loading Balance Positioning...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 4: BERTH STATUS -->
+  <div class="berth-grid" id="berthGrid">
+    <div class="berth-card st-empty" style="--col:1;--row:1"><div class="berth-head"><span class="berth-name">PCT-1</span></div><div class="berth-vessel">Loading...</div></div>
+    <div class="berth-card st-empty" style="--col:2;--row:1"><div class="berth-head"><span class="berth-name">PCT-2</span></div><div class="berth-vessel">Loading...</div></div>
+    <div class="berth-card st-empty" style="--col:3;--row:1"><div class="berth-head"><span class="berth-name">PCT-3</span></div><div class="berth-vessel">Loading...</div></div>
+  </div>
+
+</div>
+
+<script>
+const TZ = 'Asia/Dhaka';
+
+function fmtDate(d) {
+  return d.toLocaleDateString('en-US', { timeZone: TZ });   // M/D/YYYY
+}
+function fmtTime(d) {
+  return d.toLocaleTimeString('en-US', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function setSectionDate() {
+  document.getElementById('sectionDate').innerText = fmtDate(new Date());
+}
+setSectionDate();
+
+// Keys must match the sheet headers exactly (Apps Script passes every column by header name)
+const todayList = [
+  { label: 'CV', icon: 'bi-truck', key: 'Today_CV', specialKey: 'Today_Special_CV' },
+  { label: 'OCD', icon: 'bi-box-seam', key: 'Today_OCD', specialKey: 'Today_Special_OCD' },
+  { label: 'Reefer', icon: 'bi-snow', key: 'Today_Reefer_booked', specialKey: 'Today_Special_Reefer' },
+  { label: 'Inspection', icon: 'bi-search', key: 'Today_INS', calcSpecial: 'INS_DIFF' }
+];
+
+const tomorrowList = [
+  { label: 'CV', icon: 'bi-truck', key: 'Tomorrow_CV' },
+  { label: 'OCD', icon: 'bi-box-seam', key: 'Tomorrow_OCD' },
+  { label: 'Reefer', icon: 'bi-snow', key: 'Tomorrow_Reefer' },   // not in query/sheet yet → 0
+  { label: 'Inspection', icon: 'bi-search', key: 'Tomorrow_INS' }
+];
+
+// Balance Positioning card (live values from the latest sheet row)
+// Berth cards (vessel name + status are text columns in the sheet)
+const berthList = [
+  { berth: 'PCT-1', key: 'PCT1' },
+  { berth: 'PCT-2', key: 'PCT2' },
+  { berth: 'PCT-3', key: 'PCT3' }
+];
+
+// "To" values (toKey) stay in data.json but are not shown; add a <td> in renderBalanceRows to show them again
+const balanceList = [
+  { label: 'CV',         icon: 'bi-truck',  fromKey: 'Balance_CV_From',  toKey: 'Balance_CV_To' },
+  { label: 'CFS',        icon: 'bi-boxes',  fromKey: 'Balance_CFS_From', toKey: 'Balance_CFS_To' },
+  { label: 'Inspection', icon: 'bi-search', fromKey: 'Balance_INS_From', toKey: 'Balance_INS_To' }
+];
+
+// Case-insensitive key lookup
+function findKey(obj, key) {
+  if (!obj) return undefined;
+  if (Object.prototype.hasOwnProperty.call(obj, key)) return key;
+  const lower = key.toLowerCase();
+  return Object.keys(obj).find(k => k.toLowerCase() === lower);
+}
+
+function hasValue(obj, key) {
+  const k = findKey(obj, key);
+  return k !== undefined && obj[k] !== null;
+}
+
+// NUMERIC HELPER FUNCTION
+function getValue(obj, key) {
+  if (!hasValue(obj, key)) return 0;
+  const parsed = parseInt(obj[findKey(obj, key)], 10);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+function renderTodayRows(data, items) {
+  let html = '';
+  items.forEach(item => {
+    const bKey = item.bookedKey || item.key;
+
+    const bookedVal = getValue(data.lockedAssignment, bKey);
+    const liveVal = getValue(data.liveYard, item.key);
+
+    let specialVal = 0;
+    if (item.calcSpecial === 'INS_DIFF') {
+      // Explicit Math: Balance - Booked
+      specialVal = Math.max(0, liveVal - bookedVal);
+    } else if (hasValue(data.liveYard, item.specialKey)) {
+      specialVal = getValue(data.liveYard, item.specialKey);
+    } else {
+      specialVal = getValue(data.lockedAssignment, item.specialKey);
+    }
+
+    html += `
+      <tr>
+        <td class="metric-name ps-3" style="color: #000000 !important;">
+          <i class="bi ${item.icon} me-2 text-primary"></i>${item.label}
+        </td>
+        <td><span class="metric-pill pill-booked">${bookedVal}</span></td>
+        <td><span class="metric-pill pill-special">${specialVal}</span></td>
+        <td><span class="metric-pill pill-balance">${liveVal}</span></td>
+      </tr>
+    `;
+  });
+  return html;
+}
+
+function renderTomorrowRows(data, items) {
+  let html = '';
+  items.forEach(item => {
+    const liveVal = getValue(data.liveYard, item.key);
+
+    html += `
+      <tr>
+        <td class="metric-name ps-3" style="color: #000000 !important;">
+          <i class="bi ${item.icon} me-2 text-primary"></i>${item.label}
+        </td>
+        <td><span class="metric-pill pill-balance">${liveVal}</span></td>
+      </tr>
+    `;
+  });
+  return html;
+}
+
+// Shows "–" until the key exists in data.json
+function showValue(obj, key) {
+  return hasValue(obj, key) ? getValue(obj, key) : '–';
+}
+
+function getText(obj, key) {
+  const k = findKey(obj, key);
+  if (k === undefined || obj[k] === null) return '';
+  const v = String(obj[k]).trim();
+  return v === '0' ? '' : v;
+}
+
+// N4 visit phase -> card colour
+function berthStatus(raw) {
+  const s = String(raw || '').toUpperCase();
+  if (s.includes('WORKING')) return { cls: 'st-working', label: 'Working' };
+  if (s.includes('COMPLETE')) return { cls: 'st-complete', label: 'Completed' };
+  if (s.includes('INBOUND')) return { cls: 'st-inbound', label: 'Inbound', showEta: true };
+  if (s.includes('ARRIVED')) return { cls: 'st-inbound', label: 'Arrived' };
+  return null;
+}
+
+// ETA arrives as "2026-10-08 07:30" (Dhaka time) or as an ISO date from Apps Script
+function formatEta(raw) {
+  if (!raw) return '';
+  let s = String(raw).trim();
+  if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2})?$/.test(s)) s = s.replace(' ', 'T') + '+06:00';
+  const d = new Date(s);
+  if (isNaN(d)) return String(raw).replace(/</g, '&lt;');
+  return d.toLocaleString('en-GB', {
+    timeZone: TZ, weekday: 'short', day: '2-digit', month: 'short',
+    hour: '2-digit', minute: '2-digit', hour12: false
+  });
+}
+
+function berthCardHtml(title, vessel, status, eta, metrics, isNext, col) {
+  return `
+      <div class="berth-card ${status ? status.cls : ''}${isNext ? ' berth-next' : ''}" style="--col:${col};--row:${isNext ? 2 : 1}">
+        <div class="berth-head">
+          <span class="berth-name">${title}</span>
+          ${status ? `<span class="berth-status">${status.label}</span>` : ''}
+        </div>
+        <div class="berth-vessel">${vessel.replace(/</g, '&lt;')}</div>
+        ${eta ? `<div class="berth-eta"><i class="bi bi-clock me-1"></i>ETA ${eta}</div>` : ''}
+        ${metrics ? `
+        <div class="berth-metrics">
+          <div><div class="bm-label">Import (Yard)</div><div class="bm-val">${metrics.imp}</div></div>
+          <div class="bm-export"><div class="bm-label">Export (Yard)</div><div class="bm-val">${metrics.exp}</div></div>
+        </div>` : ''}
+      </div>`;
+}
+
+// Import/Export row only appears once those columns exist in the sheet
+function berthMetrics(y, prefix) {
+  if (!hasValue(y, prefix + '_Import') && !hasValue(y, prefix + '_Export')) return null;
+  return { imp: showValue(y, prefix + '_Import'), exp: showValue(y, prefix + '_Export') };
+}
+
+// Per berth: top card (vessel alongside, else first Inbound) + optional next Inbound card
+function renderBerthCards(data, items) {
+  const y = data.liveYard;
+  return items.map((item, idx) => {
+    const col = idx + 1;
+    const vessel = getText(y, item.key + '_Vessel');
+    if (!vessel) {
+      return `
+      <div class="berth-card st-empty" style="--col:${col};--row:1">
+        <div class="berth-head"><span class="berth-name">${item.berth}</span></div>
+        <div class="berth-vessel">No vessel at berth</div>
+      </div>`;
+    }
+    const status = berthStatus(getText(y, item.key + '_Status'));
+    const eta = status && status.showEta ? formatEta(getText(y, item.key + '_ETA')) : '';
+    let html = berthCardHtml(item.berth, vessel, status, eta, berthMetrics(y, item.key), false, col);
+
+    const nextVessel = getText(y, item.key + '_Next_Vessel');
+    if (nextVessel) {
+      const nextStatus = { cls: 'st-inbound', label: 'Inbound' };
+      const nextEta = formatEta(getText(y, item.key + '_Next_ETA'));
+      html += berthCardHtml(item.berth + ' · Next', nextVessel, nextStatus, nextEta, berthMetrics(y, item.key + '_Next'), true, col);
+    }
+    return html;
+  }).join('');
+}
+
+function renderBalanceRows(data, items) {
+  let html = '';
+  items.forEach(item => {
+    html += `
+      <tr>
+        <td class="metric-name ps-3" style="color: #000000 !important;">
+          <i class="bi ${item.icon} me-2 text-primary"></i>${item.label}
+        </td>
+        <td><span class="metric-pill pill-booked">${showValue(data.liveYard, item.fromKey)}</span></td>
+      </tr>
+    `;
+  });
+  return html;
+}
+
+async function loadDashboard() {
+  try {
+    setSectionDate();
+
+    const response = await fetch('data.json?cacheBust=' + Date.now(), { cache: 'no-store' });
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const data = await response.json();
+
+    if (data.latestTimestamp) {
+      const dt = new Date(data.latestTimestamp);
+      if (!isNaN(dt)) {
+        document.getElementById('lastUpdated').innerText = `Last updated ${fmtDate(dt)}, ${fmtTime(dt)}`;
+      }
+    }
+
+    document.getElementById('todayKpiRows').innerHTML = renderTodayRows(data, todayList);
+    document.getElementById('tomorrowKpiRows').innerHTML = renderTomorrowRows(data, tomorrowList);
+    document.getElementById('balanceRows').innerHTML = renderBalanceRows(data, balanceList);
+    document.getElementById('berthGrid').innerHTML = renderBerthCards(data, berthList);
+
+  } catch (err) {
+    console.error('Failed to load data.json:', err);
+  }
+}
+
+loadDashboard();
+setInterval(loadDashboard, 30000);
+</script>
+</body>
+</html>
