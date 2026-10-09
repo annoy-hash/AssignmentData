@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-10-09T16:21:57.386Z",
+  "updatedAt": "2026-10-09T16:30:48.915Z",
   "lockedTimestamp": "2026-10-09T02:52:56.493Z",
-  "latestTimestamp": "2026-10-09T16:21:57.382Z",
+  "latestTimestamp": "2026-10-09T16:30:48.909Z",
   "lockedAssignment": {
     "timestamp": "2026-10-09T02:52:56.493Z",
     "Today_CV": 148,
@@ -50,7 +50,7 @@
     "PCT3_Next_Export": 0
   },
   "liveYard": {
-    "timestamp": "2026-10-09T16:21:57.382Z",
+    "timestamp": "2026-10-09T16:30:48.909Z",
     "Today_CV": 8,
     "Tomorrow_CV": 111,
     "Today_INS": 1,
@@ -82,8 +82,8 @@
     "PCT1_Next_Import": 0,
     "PCT1_Next_Export": 0,
     "PCT2_ETA": "2026-10-09 10:00",
-    "PCT2_Import": 387,
-    "PCT2_Export": 487,
+    "PCT2_Import": 392,
+    "PCT2_Export": 480,
     "PCT2_Next_Vessel": "SMOOTH VENTURE",
     "PCT2_Next_ETA": "2026-10-11 10:00",
     "PCT2_Next_Import": 0,
