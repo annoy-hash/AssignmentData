@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-10-09T17:32:02.258Z",
+  "updatedAt": "2026-10-09T17:45:57.812Z",
   "lockedTimestamp": "2026-10-09T02:52:56.493Z",
-  "latestTimestamp": "2026-10-09T17:32:02.249Z",
+  "latestTimestamp": "2026-10-09T17:45:57.808Z",
   "lockedAssignment": {
     "timestamp": "2026-10-09T02:52:56.493Z",
     "Today_CV": 148,
@@ -50,8 +50,8 @@
     "PCT3_Next_Export": 0
   },
   "liveYard": {
-    "timestamp": "2026-10-09T17:32:02.249Z",
-    "Today_CV": 34,
+    "timestamp": "2026-10-09T17:45:57.808Z",
+    "Today_CV": 4,
     "Tomorrow_CV": 111,
     "Today_INS": 1,
     "Tomorrow_INS": 41,
@@ -62,7 +62,7 @@
     "Today_Special_CV": 0,
     "Today_Reefer_booked": 0,
     "Tomorrow_Reefer": 0,
-    "Balance_CV_From": 120,
+    "Balance_CV_From": 145,
     "Balance_CV_To": 0,
     "Balance_CFS_From": 2,
     "Balance_CFS_To": 0,
@@ -82,8 +82,8 @@
     "PCT1_Next_Import": 0,
     "PCT1_Next_Export": 0,
     "PCT2_ETA": "2026-10-09 10:00",
-    "PCT2_Import": 375,
-    "PCT2_Export": 594,
+    "PCT2_Import": 403,
+    "PCT2_Export": 464,
     "PCT2_Next_Vessel": "SMOOTH VENTURE",
     "PCT2_Next_ETA": "2026-10-11 10:00",
     "PCT2_Next_Import": 0,
@@ -97,7 +97,7 @@
     "PCT3_Next_Export": 0
   },
   "deliveredBalance": {
-    "Today_CV": 114,
+    "Today_CV": 144,
     "Tomorrow_CV": 0,
     "Today_INS": 0,
     "Tomorrow_INS": 0,
