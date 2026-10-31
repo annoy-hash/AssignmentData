@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delivery Detail and Berth Information</title>
+  <!-- APP: install on phone / PC (manifest + icons) -->
+  <meta name="theme-color" content="#002b49">
+  <meta name="robots" content="noindex">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Berth Info">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    /* GLOBAL LAYOUT & TYPOGRAPHY */
+    body {
+      background-color: #e0f7fa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dashboard-container {
+      max-width: 920px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* TOP NAV HEADER */
+    .header-panel {
+      background-color: #002b49;
+      color: #ffffff;
+      border-radius: 0 0 8px 8px;
+      padding: 12px 20px;
+    }
+
+    .header-title {
+      color: #ffffff;
+      font-size: 1.3rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* CONTROLS BAR: last updated (left) + alerts button (right) */
+    .controls-bar {
+      background-color: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 16px;
+      margin-bottom: 16px;
+    }
+
+    .last-updated {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    /* on narrow phones the date/time drops to a second line as one piece */
+    .lu-time { white-space: nowrap; }
+
+    /* VESSEL ALERTS BUTTON (controls bar, right side) */
+    .alert-btn {
+      font-size: 0.78rem;
+      font-weight: 700;
+      border-radius: 20px;
+      padding: 5px 12px;
+      border: 1px solid #002b49;
+      color: #002b49;
+      background-color: #ffffff;
+      white-space: nowrap;
+    }
+    .alert-btn:hover { background-color: #e2e8f0; }
+    .alert-btn.on { background-color: #d1fae5; border-color: #10b981; color: #064e3b; }
+    .alert-btn.blocked { background-color: #e2e8f0; border-color: #cbd5e1; color: #64748b; }
+
+    /* SIGN-OUT BUTTON (controls bar, right of Alerts) */
+    .signout-btn {
+      font-size: 1.05rem;
+      border: none;
+      background: none;
+      color: #64748b;
+      padding: 5px 4px;
+      white-space: nowrap;
+    }
+    .signout-btn:hover { color: #0f172a; }
+
+    /* LOGIN CARD (same frame as the info cards) */
+    .login-wrap { max-width: 420px; margin: 24px auto 40px; width: 100%; }
+    .login-card .info-head { background-color: #002b49; }
+    .login-body { padding: 18px 16px 20px; }
+    .login-body label { font-weight: 700; font-size: 0.85rem; color: #334155; margin-bottom: 6px; display: block; }
+    .login-body .form-control { font-weight: 700; font-size: 1.05rem; width: 100%; }
+    .pin-input { letter-spacing: 8px; text-align: center; font-size: 1.4rem !important; }
+    .login-btn {
+      width: 100%;
+      margin-top: 12px;
+      font-weight: 800;
+      background-color: #002b49;
+      border-color: #002b49;
+    }
+    .login-btn:hover, .login-btn:focus { background-color: #0b4a7d; border-color: #0b4a7d; }
+    .login-msg { min-height: 1.3em; margin-top: 10px; font-size: 0.85rem; font-weight: 700; }
+    .login-msg.err { color: #b91c1c; }
+    .login-msg.ok { color: #065f46; }
+    .login-hint { font-size: 0.8rem; color: #64748b; margin-top: 8px; }
+    .link-btn { border: none; background: none; padding: 0; color: #0d6efd; font-size: 0.8rem; font-weight: 700; }
+    .d-none { display: none !important; }
+
+    /* FOOTER TIMESTAMP */
+    .footer-timestamp {
+      margin-top: auto;
+      padding: 15px 24px;
+      text-align: right;
+      color: #6c757d;
+      font-size: 0.75rem;
+    }
+
+    /* ----------------------------------------------------
+       TOP SUMMARY CARDS: Today / Tomorrow / Balance Positioning
+       Same frame as the berth cards (head bar + chip, 2px border)
+       ---------------------------------------------------- */
+    .top-grid {
+      display: grid;
+      /* Today is wider: 4 value columns */
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .info-card {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      background-color: #ffffff;
+      border: 2px solid #cbd5e1;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-head {
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+    }
+
+    /* header colours kept from the old tables */
+    .ic-today    .info-head { background-color: #0284c7; }
+    .ic-tomorrow .info-head { background-color: #002b49; }
+    .ic-balance  .info-head { background-color: #0b4a7d; }
+
+    .info-name {
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .info-chip {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      white-space: nowrap;
+    }
+
+    .info-body {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      padding-bottom: 4px;
+    }
+
+    /* one metric per row: label | value(s). --n = number of values, --w = value width */
+    .info-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) repeat(var(--n), var(--w));
+      column-gap: 6px;
+      align-items: center;
+      padding: 8px 10px 8px 12px;
+    }
+
+    .ic-today    { --n: 4; --w: 54px; }
+    .ic-today .info-row { column-gap: 4px; padding-left: 10px; padding-right: 8px; }
+    .ic-today .info-cols span { font-size: 0.5rem; line-height: 1.15; white-space: normal; letter-spacing: -0.1px; }
+    .ic-tomorrow { --n: 1; --w: 84px; }
+    .ic-balance  { --n: 1; --w: 84px; }
+
+    .info-rows {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+    }
+
+    .info-rows .info-row { flex: 1 1 auto; }
+    .info-rows .info-row + .info-row { border-top: 1px solid #e2e8f0; }
+    .info-rows .info-row:hover { background-color: #f1f5f9; }
+
+    .info-cols {
+      padding-top: 7px;
+      padding-bottom: 3px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .info-cols span {
+      font-size: 0.62rem;
+      white-space: nowrap;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #334155;
+      text-align: center;
+    }
+
+    .info-label {
+      font-weight: 800;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .info-label i { color: #0d6efd; margin-right: 6px; }
+
+    .info-val {
+      font-weight: 800;
+      font-size: 1.05rem;
+      text-align: center;
+      border-radius: 8px;
+      padding: 3px 0;
+      line-height: 1.3;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+    }
+
+    .ic-tomorrow .info-val,
+    .ic-balance  .info-val { font-size: 1.25rem; }
+
+    /* same value colours as before: grey = booked, amber = special, green = balance */
+    .v-booked  { background-color: #f1f5f9; color: #0f172a; border: 1px solid #94a3b8; }
+    .v-special { background-color: #fef3c7; color: #78350f; border: 1px solid #f59e0b; }
+    .v-balance { background-color: #d1fae5; color: #064e3b; border: 1px solid #10b981; }
+    .v-handled { background-color: #dbeafe; color: #1e3a8a; border: 1px solid #3b82f6; }
+
+    .info-empty {
+      padding: 14px 12px;
+      color: #64748b;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    /* BERTH STATUS CARDS */
+    .berth-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px 16px;
+      margin-bottom: 24px;
+    }
+
+    /* Desktop: top cards share row 1 (equal height), next cards sit in row 2 */
+    .berth-grid > .berth-card {
+      grid-column: var(--col);
+      grid-row: var(--row);
+    }
+
+    .berth-grid > .berth-card.berth-next {
+      align-self: start;
+    }
+
+    /* keep Import/Export at the bottom so rows line up across cards */
+    .berth-card .berth-metrics {
+      margin-top: auto;
+    }
+
+    .berth-card.st-empty .berth-vessel {
+      flex: 1 1 auto;
+    }
+
+    .berth-next .berth-head {
+      background-color: #334155;
+      padding: 6px 12px;
+    }
+
+    .berth-next .berth-name {
+      font-size: 0.9rem;
+    }
+
+    .berth-next .berth-vessel {
+      font-size: 1rem;
+      min-height: 0;
+      padding-top: 10px;
+    }
+
+    .berth-card {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      background-color: #f1f5f9;
+      border: 2px solid #cbd5e1;
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .berth-head {
+      background-color: #002b49;
+      color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+    }
+
+    .berth-name {
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+    }
+
+    .berth-status {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background-color: #e2e8f0;
+      color: #334155;
+    }
+
+    .berth-vessel {
+      text-align: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      padding: 12px 10px 10px;
+      line-height: 1.25;
+      min-height: 2.6em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .berth-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      text-align: center;
+      padding: 4px 8px 14px;
+    }
+
+    .bm-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: #334155;
+    }
+
+    .bm-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .bm-export {
+      border-left: 2px solid rgba(15, 23, 42, 0.25);
+    }
+
+    .berth-card.st-working  { background-color: #fef3c7; border-color: #f59e0b; }
+    .berth-card.st-complete { background-color: #d1fae5; border-color: #10b981; }
+    .berth-card.st-inbound  { background-color: #fee2e2; border-color: #f87171; }
+
+    .st-working  .berth-status { background-color: #fcd34d; color: #78350f; }
+    .st-complete .berth-status { background-color: #6ee7b7; color: #064e3b; }
+    .st-inbound  .berth-status { background-color: #fca5a5; color: #7f1d1d; }
+
+    .berth-eta {
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #7f1d1d;
+      margin-top: -6px;
+      padding-bottom: 10px;
+    }
+
+    /* ATA / work start / complete lines in neutral text */
+    .berth-eta.is-ata { color: #334155; }
+    .berth-eta + .berth-eta { margin-top: -8px; }
+
+    /* Export split (Empty / FCL) and in-yard % bar under the Export number */
+    .bm-sub {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #334155;
+      white-space: nowrap;
+    }
+    .bm-bar {
+      height: 6px;
+      border-radius: 3px;
+      background-color: rgba(15, 23, 42, 0.15);
+      margin: 5px 10px 2px;
+      overflow: hidden;
+    }
+    .bm-bar > span { display: block; height: 100%; background-color: #0284c7; }
+    .bm-pct { font-size: 0.68rem; font-weight: 700; color: #334155; white-space: nowrap; }
+
+    .berth-card.st-empty .berth-vessel {
+      color: #64748b;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-transform: none;
+    }
+
+    /* BERTH PRODUCTION (from the Hour based Productivity Calculation files) */
+    .berth-prod {
+      margin: 0 10px 10px;
+      background-color: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 8px;
+      padding: 6px 8px 8px;
+    }
+    .bp-head { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; color: #334155; text-align: center; letter-spacing: 0.2px; }
+    .bp-main { display: flex; align-items: baseline; justify-content: center; gap: 8px; }
+    .bp-val { font-size: 1.3rem; font-weight: 800; color: #002b49; line-height: 1.2; }
+    .bp-sub { font-size: 0.7rem; font-weight: 700; color: #475569; }
+    .bp-cranes-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; color: #334155; margin-top: 6px; text-align: center; }
+    .bp-cranes { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: 3px; }
+    .bp-crane {
+      font-size: 0.72rem; font-weight: 700; color: #002b49;
+      background-color: #e0f2fe; border: 1px solid #90CEF1; border-radius: 10px; padding: 1px 7px;
+      white-space: nowrap;
+    }
+
+    /* YARD UTILIZATION CARD: PCT + SCY rings side by side */
+    .util-card { margin-bottom: 24px; }
+    .util-card .info-head { background-color: #002b49; }
+    .util-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 12px 8px 14px;
+    }
+    .util-item { text-align: center; }
+    .util-item + .util-item { border-left: 1px solid #e2e8f0; }
+    .util-name {
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #002b49;
+      margin-bottom: 6px;
+    }
+    .util-ring { width: 128px; height: 128px; display: block; margin: 0 auto; }
+    .util-ring .track { stroke: #e2e8f0; }
+    .util-ring .pct   { fill: #002b49; font-weight: 800; font-size: 21px; }
+    /* level colours: normal = RSGT green, busy = amber, full = red */
+    .util-ring.lv-ok   .fill { stroke: #008E73; }
+    .util-ring.lv-busy .fill { stroke: #f59e0b; }
+    .util-ring.lv-full .fill { stroke: #dc2626; }
+
+    /* TABLET: Today full width, Tomorrow + Balance side by side */
+    @media (max-width: 899.98px) {
+      .top-grid { grid-template-columns: 1fr 1fr; }
+      .top-grid .ic-today { grid-column: 1 / -1; --w: 72px; }
+    }
+
+    /* MOBILE OPTIMIZATION */
+    @media (max-width: 576px) {
+      body {
+        padding: 0 4px;
+      }
+
+      .dashboard-container {
+        padding-left: 2px;
+        padding-right: 2px;
+      }
+
+      .header-panel {
+        padding: 12px 10px;
+      }
+
+      .header-title {
+        font-size: 1rem;
+      }
+
+      .controls-bar {
+        padding: 7px 10px;
+        margin-bottom: 12px;
+      }
+
+      .last-updated {
+        font-size: 0.74rem;
+      }
+
+      .alert-btn {
+        font-size: 0.72rem;
+        padding: 4px 10px;
+      }
+
+      .top-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .top-grid .ic-today { --w: 54px; }
+      .ic-today .info-cols span { font-size: 0.52rem; }
+      .ic-today .info-label { font-size: 0.86rem; }
+      .ic-today .info-label i { margin-right: 4px; }
+
+      .berth-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .berth-grid > .berth-card {
+        grid-column: auto;
+        grid-row: auto;
+      }
+
+      .berth-vessel {
+        min-height: 0;
+        font-size: 1rem;
+      }
+
+      .bm-val {
+        font-size: 1.35rem;
+      }
+
+      .util-ring { width: 112px; height: 112px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV HEADER (title only) -->
+<div class="header-panel mb-3 shadow-sm">
+  <div class="dashboard-container text-center">
+    <h4 class="header-title mb-0">Delivery Detail and Berth Information</h4>
+  </div>
+</div>
+
+<div class="container dashboard-container py-2">
+
+  <!-- CONTROL BAR: last updated + vessel alerts button -->
+  <div id="controlsBar" class="controls-bar shadow-sm d-flex align-items-center justify-content-between gap-2 d-none">
+    <span class="last-updated">Last updated <span id="lastUpdated" class="lu-time">--/--/----, --:--:-- --</span></span>
+    <span class="d-flex align-items-center gap-1">
+      <button id="alertBtn" type="button" class="alert-btn d-none" onclick="enableAlerts()">
+        <i class="bi bi-bell me-1"></i>Alerts
+      </button>
+      <button id="signOutBtn" type="button" class="signout-btn d-none" onclick="signOut()" title="Sign out">
+        <i class="bi bi-box-arrow-right"></i>
+      </button>
+    </span>
+  </div>
+
+  <!-- LOGIN (only when LOGIN_REQUIRED = true and this device has no valid login) -->
+  <div id="loginView" class="login-wrap d-none">
+    <div class="info-card login-card">
+      <div class="info-head"><span class="info-name">Sign in</span></div>
+      <div class="login-body">
+        <form id="loginForm" onsubmit="signIn(event)">
+          <label for="loginEmail">Company email</label>
+          <input id="loginEmail" class="form-control" type="email" autocomplete="username" inputmode="email" placeholder="name@rsgt.com.bd" required>
+          <label for="loginPin" style="margin-top:12px">PIN</label>
+          <input id="loginPin" class="form-control pin-input" type="password" inputmode="numeric" autocomplete="current-password" maxlength="6" pattern="\d{6}" placeholder="••••••" required>
+          <button id="signInBtn" class="btn btn-primary login-btn" type="submit">Sign in</button>
+          <div class="login-hint">Use the email and 6-digit PIN given to you by Berth &amp; Yard Planning.</div>
+        </form>
+        <div id="loginMsg" class="login-msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dashView" class="d-none">
+
+  <!-- SECTION 1-3: TODAY / TOMORROW / BALANCE POSITIONING -->
+  <div class="top-grid">
+
+    <div class="info-card ic-today">
+      <div class="info-head">
+        <span class="info-name">Today</span>
+        <span class="info-chip" id="todayChip">--</span>
+      </div>
+      <div class="info-body">
+        <div class="info-row info-cols"><span></span><span>Booked<br>Yesterday</span><span>Special/<br>Others</span><span>Handled Or<br>In-Process</span><span>Balance</span></div>
+        <div class="info-rows" id="todayKpiRows"><div class="info-empty">Loading...</div></div>
+      </div>
+    </div>
+
+    <div class="info-card ic-tomorrow">
+      <div class="info-head">
+        <span class="info-name">Tomorrow</span>
+        <span class="info-chip" id="tomorrowChip">--</span>
+      </div>
+      <div class="info-body">
+        <div class="info-row info-cols"><span></span><span>Booked</span></div>
+        <div class="info-rows" id="tomorrowKpiRows"><div class="info-empty">Loading...</div></div>
+      </div>
+    </div>
+
+    <div class="info-card ic-balance">
+      <div class="info-head">
+        <span class="info-name">Balance Positioning</span>
+      </div>
+      <div class="info-body">
+        <div class="info-rows" id="balanceRows"><div class="info-empty">Loading...</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SECTION 4: BERTH STATUS -->
+  <div class="berth-grid" id="berthGrid">
+    <div class="berth-card st-empty" style="--col:1;--row:1"><div class="berth-head"><span class="berth-name">PCT-1</span></div><div class="berth-vessel">Loading...</div></div>
+    <div class="berth-card st-empty" style="--col:2;--row:1"><div class="berth-head"><span class="berth-name">PCT-2</span></div><div class="berth-vessel">Loading...</div></div>
+    <div class="berth-card st-empty" style="--col:3;--row:1"><div class="berth-head"><span class="berth-name">PCT-3</span></div><div class="berth-vessel">Loading...</div></div>
+  </div>
+
+  <!-- SECTION 5: YARD UTILIZATION (PCT + SCY) -->
+  <div class="info-card util-card">
+    <div class="info-head"><span class="info-name">Yard Utilization</span></div>
+    <div class="util-grid" id="utilGrid"><div class="info-empty">Loading...</div></div>
+  </div>
+
+  </div><!-- /dashView -->
+
+</div>
+
+<script>
+/* ======================= APP SETTINGS (fill once) ======================= */
+// LOGIN SWITCH
+//   false = no login, data from public data.json (today)
+//   true  = sign-in with company email + PIN, data from the Apps Script (token checked)
+const LOGIN_REQUIRED = true;
+// Apps Script ▸ Deploy ▸ Web app URL (ends with /exec) — used only to sign up for alerts
+const API_URL = 'https://script.google.com/macros/s/AKfycbxJADI5S0_chwxrZO4JX5RNhy5-qYnnjQD2YE-tyKGURL7iFReYLTARwt9CVV1WSXUB/exec';
+// Firebase console ▸ Project settings ▸ General ▸ Your apps ▸ Web app ▸ Config
+const FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyBaUzVWA0Z1f-tuMeAeAL6vOzGm_n2BNkw',
+  authDomain: 'berth-info.firebaseapp.com',
+  projectId: 'berth-info',
+  messagingSenderId: '989754627609',
+  appId: '1:989754627609:web:8375efdf874c8febcefc88'
+};
+// Firebase console ▸ Project settings ▸ Cloud Messaging ▸ Web Push certificates ▸ Key pair
+const VAPID_KEY = 'BJjwtEzaWsBsroeiXps5Vu_gD0fESouuGJRtElR-LRJTveF4DsGGOTX4HicsNqnWiBY6LPk4EVNkpRRnAubvKQc';
+/* ======================================================================== */
+
+const TZ = 'Asia/Dhaka';
+
+function fmtDate(d) {
+  return d.toLocaleDateString('en-US', { timeZone: TZ });   // M/D/YYYY
+}
+function fmtTime(d) {
+  return d.toLocaleTimeString('en-US', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+function fmtChip(d) {
+  return d.toLocaleDateString('en-GB', { timeZone: TZ, weekday: 'short', day: '2-digit', month: 'short' });   // Thu 08 Oct
+}
+
+function setSectionDate() {
+  const now = new Date();
+  document.getElementById('todayChip').innerText = fmtChip(now);
+  document.getElementById('tomorrowChip').innerText = fmtChip(new Date(now.getTime() + 864e5));
+}
+setSectionDate();
+
+// Keys must match the sheet headers exactly (Apps Script passes every column by header name)
+// key = Balance (container table) | bookedKey = Booked (N4 events) | specialKey = Special
+// handledKey (optional) = own Handled & InProcess column; otherwise Booked − Balance
+const todayList = [
+  // lockedYesterdayKey = Booked Yesterday comes from yesterday's final (23:59) value of this Tomorrow_* column
+  { label: 'CV',         icon: 'bi-truck',    key: 'Today_CV',            bookedKey: 'Today_Booked_CV',     specialKey: 'Today_Special_CV',
+    lockedYesterdayKey: 'Tomorrow_CV' },
+  { label: 'OCD',        icon: 'bi-box-seam', key: 'Today_OCD',           bookedKey: 'Today_Booked_OCD',    specialKey: 'Today_Special_OCD',
+    lockedYesterdayKey: 'Tomorrow_OCD' },
+  { label: 'Reefer',     icon: 'bi-snow',     key: 'Today_Reefer_booked', bookedKey: 'Today_Booked_Reefer', specialKey: 'Today_Special_Reefer',
+    lockedYesterdayKey: 'Tomorrow_Reefer' },
+  { label: 'Inspection', icon: 'bi-search',   key: 'Today_INS',           bookedKey: 'Today_Booked_INS',    specialKey: 'Today_Special_INS',
+    lockedYesterdayKey: 'Tomorrow_INS' }
+];
+
+const tomorrowList = [
+  { label: 'CV', icon: 'bi-truck', key: 'Tomorrow_CV' },
+  { label: 'OCD', icon: 'bi-box-seam', key: 'Tomorrow_OCD' },
+  { label: 'Reefer', icon: 'bi-snow', key: 'Tomorrow_Reefer' },
+  { label: 'Inspection', icon: 'bi-search', key: 'Tomorrow_INS' }
+];
+
+// Berth cards (vessel name + status are text columns in the sheet)
+const berthList = [
+  { berth: 'PCT-1', key: 'PCT1' },
+  { berth: 'PCT-2', key: 'PCT2' },
+  { berth: 'PCT-3', key: 'PCT3' }
+];
+
+// Balance Positioning card (live values from the latest sheet row)
+// Shows the "To" positions (toKey); "From" values stay in data.json but are not shown
+const balanceList = [
+  { label: 'CV/Reefer',         icon: 'bi-truck',  fromKey: 'Balance_CV_From',  toKey: 'Balance_CV_To' },
+  { label: 'CFS',        icon: 'bi-boxes',  fromKey: 'Balance_CFS_From', toKey: 'Balance_CFS_To' },
+  { label: 'Inspection', icon: 'bi-search', fromKey: 'Balance_INS_From', toKey: 'Balance_INS_To' }
+];
+
+// Case-insensitive key lookup
+function findKey(obj, key) {
+  if (!obj) return undefined;
+  if (Object.prototype.hasOwnProperty.call(obj, key)) return key;
+  const lower = key.toLowerCase();
+  return Object.keys(obj).find(k => k.toLowerCase() === lower);
+}
+
+function hasValue(obj, key) {
+  const k = findKey(obj, key);
+  return k !== undefined && obj[k] !== null;
+}
+
+// NUMERIC HELPER FUNCTION
+function getValue(obj, key) {
+  if (!hasValue(obj, key)) return 0;
+  const parsed = parseInt(obj[findKey(obj, key)], 10);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+// One card row: label on the left, value boxes on the right
+function infoRowHtml(item, values) {
+  return `
+        <div class="info-row">
+          <span class="info-label"><i class="bi ${item.icon}"></i>${item.label}</span>
+          ${values.map(v => `<span class="info-val ${v.cls}">${v.val}</span>`).join('')}
+        </div>`;
+}
+
+function renderTodayRows(data, items) {
+  const y = data.liveYard;
+  return items.map(item => {
+    // Booked (all, N4 events); until the column exists in the sheet, the 09:00 snapshot
+    const bookedAll = hasValue(y, item.bookedKey) ? getValue(y, item.bookedKey) : getValue(data.lockedAssignment, item.key);
+    const specialVal = hasValue(y, item.specialKey) ? getValue(y, item.specialKey) : getValue(data.lockedAssignment, item.specialKey);
+    const balanceVal = getValue(y, item.key);
+    // Booked Yesterday = Booked − Special (booked before today)
+    // lockedYesterdayKey: yesterday's last value of that column instead (locked at 23:59 by the Apps Script)
+    const yf = data.yesterdayFinal;
+    const bookedYesterday = item.lockedYesterdayKey && yf && hasValue(yf, item.lockedYesterdayKey)
+      ? getValue(yf, item.lockedYesterdayKey)
+      : Math.max(0, bookedAll - specialVal);
+
+    // Handled & In-Process Calculation:
+    // For Inspection: (Yesterday Booked + Special) - Balance
+    // For others with handledKey: custom key or default (bookedAll - balanceVal)
+    let handledVal = 0;
+    if (item.label === 'Inspection') {
+      handledVal = Math.max(0, (bookedYesterday + specialVal) - balanceVal);
+    } else if (item.handledKey && hasValue(y, item.handledKey)) {
+      handledVal = getValue(y, item.handledKey);
+    } else {
+      handledVal = Math.max(0, bookedAll - balanceVal);
+    }
+
+    return infoRowHtml(item, [
+      { cls: 'v-booked',  val: bookedYesterday },
+      { cls: 'v-special', val: specialVal },
+      { cls: 'v-handled', val: handledVal },
+      { cls: 'v-balance', val: balanceVal }
+    ]);
+  }).join('');
+}
+
+function renderTomorrowRows(data, items) {
+  return items.map(item =>
+    infoRowHtml(item, [{ cls: 'v-balance', val: getValue(data.liveYard, item.key) }])
+  ).join('');
+}
+
+// Shows "–" until the key exists in data.json
+function showValue(obj, key) {
+  return hasValue(obj, key) ? getValue(obj, key) : '–';
+}
+
+function renderBalanceRows(data, items) {
+  return items.map(item =>
+    infoRowHtml(item, [{ cls: 'v-booked', val: showValue(data.liveYard, item.toKey) }])
+  ).join('');
+}
+
+function getText(obj, key) {
+  const k = findKey(obj, key);
+  if (k === undefined || obj[k] === null) return '';
+  const v = String(obj[k]).trim();
+  return v === '0' ? '' : v;
+}
+
+// N4 visit phase -> card colour
+function berthStatus(raw) {
+  const s = String(raw || '').toUpperCase();
+  if (s.includes('WORKING')) return { cls: 'st-working', label: 'Working' };
+  if (s.includes('COMPLETE')) return { cls: 'st-complete', label: 'Completed' };
+  if (s.includes('INBOUND')) return { cls: 'st-inbound', label: 'Inbound', showEta: true };
+  if (s.includes('ARRIVED')) return { cls: 'st-inbound', label: 'Arrived' };
+  return null;
+}
+
+// ETA arrives as "2026-10-08 07:30" (Dhaka time) or as an ISO date from Apps Script
+function formatEta(raw) {
+  if (!raw) return '';
+  let s = String(raw).trim();
+  if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2})?$/.test(s)) s = s.replace(' ', 'T') + '+06:00';
+  const d = new Date(s);
+  if (isNaN(d)) return String(raw).replace(/</g, '&lt;');
+  return d.toLocaleString('en-GB', {
+    timeZone: TZ, weekday: 'short', day: '2-digit', month: 'short',
+    hour: '2-digit', minute: '2-digit', hour12: false
+  });
+}
+
+/* ----------------------------------------------------
+   BERTH PRODUCTION — current shift. Sheet column Prod_JSON (filled by the Power Automate
+   flow from the Office Script BerthProduction). Matched to the berth vessel by name:
+   file name "SMOOTH VENTURE SVEN023.1" ↔ N4 vessel "SMOOTH VENTURE".
+   ---------------------------------------------------- */
+function prodList(y) {
+  const raw = getText(y, 'Prod_JSON');
+  if (!raw || raw[0] !== '[') return [];
+  try { const a = JSON.parse(raw); return Array.isArray(a) ? a : []; } catch (e) { return []; }
+}
+function normName(s) { return String(s || '').toUpperCase().replace(/\s+/g, ' ').trim(); }
+function findProd(list, vessel) {
+  const k = normName(vessel);
+  if (!k) return null;
+  return list.find(p => { const n = normName(p.v); return n === k || n.startsWith(k + ' '); }) || null;
+}
+function f1(n) { const x = Number(n); return isNaN(x) ? '–' : x.toFixed(1); }
+function prodHtml(p) {
+  // nothing until the shift has moves (vessel name alone = no white box)
+  if (!p || !(Number(p.m) > 0) || !(Number(p.p) > 0)) return '';
+  const cranes = (p.cr || []).map(c => `<span class="bp-crane">${String(c.c).replace(/</g, '&lt;')} <b>${f1(c.g)}</b></span>`).join('');
+  return `
+        <div class="berth-prod">
+          <div class="bp-head">Vessel production · ${String(p.sh || 'This shift').replace(/</g, '&lt;')}</div>
+          <div class="bp-main"><span class="bp-val">${f1(p.p)}</span></div>
+          ${cranes ? `<div class="bp-cranes-label">Gross crane production</div><div class="bp-cranes">${cranes}</div>` : ''}
+        </div>`;
+}
+
+// times = [{ label, text, eta }] lines under the vessel name
+function berthCardHtml(title, vessel, status, times, metrics, isNext, col, prod) {
+  return `
+      <div class="berth-card ${status ? status.cls : ''}${isNext ? ' berth-next' : ''}" style="--col:${col};--row:${isNext ? 2 : 1}">
+        <div class="berth-head">
+          <span class="berth-name">${title}</span>
+          ${status ? `<span class="berth-status">${status.label}</span>` : ''}
+        </div>
+        <div class="berth-vessel">${vessel.replace(/</g, '&lt;')}</div>
+        ${times.map(t => `<div class="berth-eta${t.eta ? '' : ' is-ata'}"><i class="bi ${t.eta ? 'bi-clock' : 'bi-clock-history'} me-1"></i>${t.label} ${t.text}</div>`).join('')}
+        ${prodHtml(prod)}
+        ${metrics ? `
+        <div class="berth-metrics">
+          <div><div class="bm-label">Import (Yard)</div><div class="bm-val">${metrics.imp}</div></div>
+          <div class="bm-export">
+            <div class="bm-label">Export (Yard)</div><div class="bm-val">${metrics.exp}</div>
+            ${metrics.split ? metrics.split.map(t => `<div class="bm-sub">${t}</div>`).join('') : ''}
+            ${metrics.pct !== null ? `<div class="bm-bar"><span style="width:${Math.min(100, metrics.pct)}%"></span></div>
+            <div class="bm-pct">${metrics.pct}% in yard (${metrics.exp} / ${metrics.total})</div>` : ''}
+          </div>
+        </div>` : ''}
+      </div>`;
+}
+
+// Import / Export row only appears once those columns exist in the sheet
+//   Export split: PREFIX_Export_FCL / _MTY  ->  "FCL - x" then "Empty - y"
+//   In-yard %   : PREFIX_Export_Total (all export boxes of the o/b visit incl. not yet arrived)
+//                 -> hidden until that column exists in the sheet
+function berthMetrics(y, prefix) {
+  if (!hasValue(y, prefix + '_Import') && !hasValue(y, prefix + '_Export')) return null;
+  const exp = showValue(y, prefix + '_Export');
+  let split = null;
+  if (hasValue(y, prefix + '_Export_MTY') || hasValue(y, prefix + '_Export_FCL')) {
+    split = [`FCL - ${getValue(y, prefix + '_Export_FCL')}`, `Empty - ${getValue(y, prefix + '_Export_MTY')}`];
+  }
+  const total = getValue(y, prefix + '_Export_Total');
+  const pct = total > 0 ? Math.round(getValue(y, prefix + '_Export') * 100 / total) : null;
+  return { imp: showValue(y, prefix + '_Import'), exp, split, pct, total };
+}
+
+// Per berth: top card (vessel alongside, else first Inbound) + optional next card
+function renderBerthCards(data, items) {
+  const y = data.liveYard;
+  const prods = prodList(y);
+  return items.map((item, idx) => {
+    const col = idx + 1;
+    const vessel = getText(y, item.key + '_Vessel');
+    if (!vessel) {
+      return `
+      <div class="berth-card st-empty" style="--col:${col};--row:1">
+        <div class="berth-head"><span class="berth-name">${item.berth}</span></div>
+        <div class="berth-vessel">No vessel at berth</div>
+      </div>`;
+    }
+    const status = berthStatus(getText(y, item.key + '_Status'));
+    // Inbound: ETA | Arrived: ATA | Working: ATA + work start | Completed: ATA + work complete
+    const times = [];
+    const add = (label, key, eta) => { const t = formatEta(getText(y, item.key + key)); if (t) times.push({ label, text: t, eta }); };
+    if (status && status.showEta) add('ETA', '_ETA', true);
+    else if (status) {
+      add('ATA', '_ATA');
+      if (status.cls === 'st-working') add('Start', '_WorkStart');
+      if (status.cls === 'st-complete') add('Done', '_WorkComplete');
+    }
+    // production only while Working / after Complete (until the file goes to backup)
+    const prod = status && (status.cls === 'st-working' || status.cls === 'st-complete') ? findProd(prods, vessel) : null;
+    let html = berthCardHtml(item.berth, vessel, status, times, berthMetrics(y, item.key), false, col, prod);
+
+    const nextVessel = getText(y, item.key + '_Next_Vessel');
+    if (nextVessel) {
+      // PCTn_Next_Status is optional: blank / missing = Inbound
+      const nextStatus = berthStatus(getText(y, item.key + '_Next_Status') || 'INBOUND');
+      const nextEta = nextStatus.showEta ? formatEta(getText(y, item.key + '_Next_ETA')) : '';
+      const nextTimes = nextEta ? [{ label: 'ETA', text: nextEta, eta: true }] : [];
+      html += berthCardHtml(item.berth + ' · Next', nextVessel, nextStatus, nextTimes, berthMetrics(y, item.key + '_Next'), true, col);
+    }
+    return html;
+  }).join('');
+}
+
+/* ----------------------------------------------------
+   YARD UTILIZATION (PCT + SCY rings)
+   Values come from the DAX as percent (e.g. 60.34), sent in spare columns:
+     PCT = Balance_CV_From   SCY = Balance_CFS_From
+   Colour: below busy = green, busy..full = amber, from full = red
+   ---------------------------------------------------- */
+const utilList = [
+  { label: 'PCT', key: 'Balance_CV_From' },
+  { label: 'SCY', key: 'Balance_CFS_From' }
+];
+const UTIL_LEVELS = { busy: 70, full: 85 };   // % — same levels as the utilization alerts
+
+function getNum(obj, key) {
+  if (!hasValue(obj, key)) return null;
+  const n = parseFloat(obj[findKey(obj, key)]);
+  return isNaN(n) ? null : n;
+}
+
+function utilLevel(p) {
+  return p >= UTIL_LEVELS.full ? 'lv-full' : p >= UTIL_LEVELS.busy ? 'lv-busy' : 'lv-ok';
+}
+
+function renderUtil(data, items) {
+  return items.map(item => {
+    const p = getNum(data.liveYard, item.key);
+    const shown = p === null ? 0 : Math.min(100, Math.max(0, p));
+    const text = p === null ? '–' : p.toFixed(1) + '%';
+    return `
+      <div class="util-item">
+        <div class="util-name">${item.label}</div>
+        <svg class="util-ring ${p === null ? '' : utilLevel(p)}" viewBox="0 0 120 120" role="img" aria-label="${item.label} utilization ${text}">
+          <circle class="track" cx="60" cy="60" r="48" fill="none" stroke-width="14"/>
+          ${shown > 0 ? `<circle class="fill" cx="60" cy="60" r="48" fill="none" stroke-width="14" pathLength="100"
+                  stroke-dasharray="${shown} 100" stroke-linecap="round" transform="rotate(-90 60 60)"/>` : ''}
+          <text class="pct" x="60" y="67" text-anchor="middle">${text}</text>
+        </svg>
+      </div>`;
+  }).join('');
+}
+
+/* ----------------------------------------------------
+   VESSEL ALERTS
+   Every refresh (30 s) the page compares each berth vessel's N4 phase with the
+   previous refresh and shows a browser notification when it changes:
+   - ARRIVED:   INBOUND -> ARRIVED (or straight to WORKING if ARRIVED was missed between flow runs)
+   - COMPLETED: INBOUND / ARRIVED / WORKING -> COMPLETE
+   - DEPARTED:  was COMPLETE at the last refresh and is no longer on any berth card
+                (60DEPARTED vessels are not in the query, so leaving = disappearing)
+   Notes:
+   - Only while this page is open in a tab (background tab is fine)
+   - Each viewer clicks "Alerts" once to allow notifications
+   - sw.js (same folder) is needed for Android Chrome; desktop works without it
+   - Memory is kept in the browser (localStorage key 'berthPhaseMemory'):
+       { savedAt: <ms>, vessels: { "MCC CEBU": { name, rank, berth, seen: <ms> } } }
+     rank: 20 Inbound, 30 Arrived, 40 Working, 50 Complete, 60 Departed (alerted)
+   ---------------------------------------------------- */
+const ALERT_MEMORY_KEY = 'berthPhaseMemory';
+const DEPART_MEMORY_KEY = 'departedMemory';
+let vesselDataTime = '';   // time of the data the vessel alert is based on
+const MEMORY_FRESH_MS = 30 * 60 * 1000;      // memory older than this (page was closed) -> re-seed silently, no alerts
+const MEMORY_KEEP_MS = 3 * 24 * 3600 * 1000; // forget vessels not seen for 3 days
+let swReg = null;
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(() => navigator.serviceWorker.ready)
+    .then(reg => { swReg = reg; refreshPushToken(); })
+    .catch(() => { /* no sw.js: desktop falls back to new Notification() */ });
+}
+
+// N4 phase text -> number, so "moved forward" is a simple comparison
+function phaseRank(raw) {
+  const s = String(raw || '').toUpperCase();
+  if (s.includes('INBOUND')) return 20;
+  if (s.includes('ARRIVED')) return 30;
+  if (s.includes('WORKING')) return 40;
+  if (s.includes('COMPLETE')) return 50;
+  return 0;
+}
+
+// Every vessel currently on the berth cards (top + next) with its phase
+function currentVessels(y) {
+  const list = [];
+  berthList.forEach(b => {
+    const top = getText(y, b.key + '_Vessel');
+    if (top) list.push({ name: top, berth: b.berth, rank: phaseRank(getText(y, b.key + '_Status')),
+                         ata: getText(y, b.key + '_ATA'), ws: getText(y, b.key + '_WorkStart'), wc: getText(y, b.key + '_WorkComplete') });
+    const next = getText(y, b.key + '_Next_Vessel');
+    if (next) list.push({ name: next, berth: b.berth, rank: phaseRank(getText(y, b.key + '_Next_Status') || 'INBOUND') });
+  });
+  return list;
+}
+
+function loadMemory() {
+  try { return JSON.parse(localStorage.getItem(ALERT_MEMORY_KEY)) || null; } catch (e) { return null; }
+}
+function saveMemory(mem) {
+  try { localStorage.setItem(ALERT_MEMORY_KEY, JSON.stringify(mem)); } catch (e) { /* storage blocked */ }
+}
+
+// Compares each vessel's phase with the previous refresh and alerts on a change
+function checkVesselAlerts(data) {
+  const now = Date.now();
+  const dt = new Date(data.latestTimestamp || now);
+  vesselDataTime = (isNaN(dt) ? new Date() : dt).toLocaleTimeString('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false });
+  const y = data.liveYard;
+  const lastCols = berthList.some(b => hasValue(y, b.key + '_Last_Vessel'));
+  const mem = loadMemory();
+  const fresh = !!(mem && mem.vessels && now - mem.savedAt < MEMORY_FRESH_MS);
+  const prev = fresh ? mem.vessels : {};
+  const keep = {};
+  const onCardsNow = {};
+
+  // 1. Vessels on the cards now -> ARRIVED / COMPLETED
+  currentVessels(data.liveYard).forEach(v => {
+    const key = v.name.toUpperCase();
+    const before = prev[key];
+    if (before) {
+      if (before.rank === 20 && (v.rank === 30 || v.rank === 40)) notifyArrival(v);
+      if (before.rank >= 20 && before.rank <= 40 && v.rank === 50) notifyComplete(v);
+      if (before.rank === 30 && v.rank === 40) notifyWorkStart(v);
+    }
+    keep[key] = { name: v.name, rank: v.rank, berth: v.berth, seen: now };
+    onCardsNow[key] = true;
+  });
+
+  // 2. Vessels gone from the cards -> DEPARTED (only if it was Complete at the last refresh)
+  Object.keys(prev).forEach(key => {
+    if (onCardsNow[key]) return;
+    const before = prev[key];
+    const wasOnCardsLastRefresh = before.seen === mem.savedAt;
+    if (!lastCols && wasOnCardsLastRefresh && before.rank === 50) {   // fallback when Last_* columns are missing
+      notifyDeparture({ name: before.name || key, berth: before.berth || 'berth' });
+      keep[key] = { name: before.name || key, rank: 60, berth: before.berth, seen: before.seen };
+    } else if (now - before.seen < MEMORY_KEEP_MS) {
+      keep[key] = before;
+    }
+  });
+
+  saveMemory({ savedAt: now, vessels: keep });
+
+  // 3. DEPARTED from PCTn_Last_Vessel / PCTn_Last_ATD (one alert per vessel)
+  if (lastCols) {
+    let dep = null;
+    try { dep = JSON.parse(localStorage.getItem(DEPART_MEMORY_KEY)); } catch (e) { dep = null; }
+    const seeded = !!(dep && dep.names);
+    const names = seeded ? dep.names : {};
+    berthList.forEach(b => {
+      const name = getText(y, b.key + '_Last_Vessel');
+      if (!name || names[name.toUpperCase()]) return;
+      if (seeded) notifyDeparture({ name: name, berth: b.berth, atd: getText(y, b.key + '_Last_ATD') });
+      names[name.toUpperCase()] = now;
+    });
+    Object.keys(names).forEach(k => { if (now - names[k] > MEMORY_KEEP_MS) delete names[k]; });
+    try { localStorage.setItem(DEPART_MEMORY_KEY, JSON.stringify({ names: names })); } catch (e) { /* blocked */ }
+  }
+}
+
+/* ====================================================
+   NUMBER ALERTS  —  EDIT HERE
+   ----------------------------------------------------
+   enabled    : true = on, false = off
+   thresholds : levels that trigger an alert (one alert per level, no repeats)
+   title      : notification heading
+   message    : notification text   {value} = current number   {day} = date
+                {time} = time of the data (Last updated), so a late-arriving alert is not misread
+   A viewer who opens the page late gets ONE alert for the highest level already passed.
+   ==================================================== */
+const ALERT_CONFIG = {
+
+  // Tomorrow's booking (Tomorrow card). Memory resets every day.
+  tomorrowBooking: [
+    { label: 'CV',         key: 'Tomorrow_CV',  enabled: true,
+      thresholds: [50, 100, 130, 170, 190],
+      title: 'Tomorrow CV booking',
+      message: 'Tomorrow ({day}) CV booking is {value} as of {time}' },
+
+    { label: 'OCD',        key: 'Tomorrow_OCD', enabled: true,
+      thresholds: [50, 100, 130, 170, 190],
+      title: 'Tomorrow OCD booking',
+      message: 'Tomorrow ({day}) OCD booking is {value} as of {time}' },
+
+    { label: 'Inspection', key: 'Tomorrow_INS', enabled: true,
+      thresholds: [50, 80, 90, 100],
+      title: 'Tomorrow Inspection booking',
+      message: 'Tomorrow ({day}) Inspection booking is {value} as of {time}' }
+  ],
+
+  // CV still in the yard (Today card, Balance) — only between fromHour and toHour, Dhaka time.
+  // Memory resets every night (the night starting at fromHour).
+  cvBalance: {
+    label: 'CV balance', key: 'Today_CV', enabled: true,
+    thresholds: [50, 70, 100],
+    fromHour: 18,   // 6 pm
+    toHour: 24,     // midnight (11:59 pm is the last check)
+    title: 'CV balance in yard',
+    message: 'There are {value} CV still in the yard as of {time} ({day})'
+  },
+
+  // Yard utilization (%). One alert when it crosses each level; alerts again after it
+  // has dropped back below that level (2% margin) and crosses it again.
+  utilization: [
+    { label: 'PCT', key: 'Balance_CV_From',  enabled: true,
+      thresholds: [70, 85],
+      title: 'PCT yard utilization',
+      message: 'PCT yard utilization is {value}% as of {time} ({day})' },
+
+    { label: 'SCY', key: 'Balance_CFS_From', enabled: true,
+      thresholds: [70, 85],
+      title: 'SCY yard utilization',
+      message: 'SCY yard utilization is {value}% as of {time} ({day})' }
+  ]
+};
+/* ==================================================== */
+
+const NUMBER_ALERT_MEMORY_KEY = 'numberAlertMemory';
+
+function dhakaHour() {
+  return Number(new Date().toLocaleString('en-US', { timeZone: TZ, hour: '2-digit', hour12: false })) % 24;
+}
+function dayText(d) {   // "Thu, Oct 15"
+  return d.toLocaleDateString('en-US', { timeZone: TZ, weekday: 'short', month: 'short', day: 'numeric' });
+}
+let alertDataTime = '';   // "14:35" — time of the data the alert is based on
+function fillMsg(text, value, day) {
+  return String(text).replace(/\{value\}/g, value).replace(/\{day\}/g, day).replace(/\{time\}/g, alertDataTime);
+}
+
+// One rule: alert when the value reaches a higher level than already alerted in this period
+function levelAlert(mem, memKey, rule, value, day) {
+  const passed = rule.thresholds.filter(t => value >= t);
+  const level = passed.length ? Math.max.apply(null, passed) : 0;
+  const before = mem[memKey] || 0;
+  if (level > before) {
+    showNotice(rule.title, fillMsg(rule.message, value, day), memKey + '-' + level);
+  }
+  mem[memKey] = Math.max(before, level);
+}
+
+function checkNumberAlerts(data) {
+  const y = data.liveYard;
+  const dt = new Date(data.latestTimestamp || Date.now());
+  alertDataTime = (isNaN(dt) ? new Date() : dt).toLocaleTimeString('en-GB', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false });
+  let mem = null;
+  try { mem = JSON.parse(localStorage.getItem(NUMBER_ALERT_MEMORY_KEY)) || {}; } catch (e) { mem = {}; }
+
+  // 1. Tomorrow's booking — period = tomorrow's date
+  const tomorrowDay = dayText(new Date(Date.now() + 864e5));
+  if (mem.bookingDay !== tomorrowDay) { mem.booking = {}; mem.bookingDay = tomorrowDay; }
+  ALERT_CONFIG.tomorrowBooking.forEach(rule => {
+    if (!rule.enabled || !hasValue(y, rule.key)) return;
+    levelAlert(mem.booking, rule.label, rule, getValue(y, rule.key), tomorrowDay);
+  });
+
+  // 2. CV balance in yard — only inside the night window; period = date the night started
+  const c = ALERT_CONFIG.cvBalance;
+  if (c.enabled && hasValue(y, c.key)) {
+    const h = dhakaHour();
+    const inWindow = c.fromHour > c.toHour ? (h >= c.fromHour || h < c.toHour) : (h >= c.fromHour && h < c.toHour);
+    if (inWindow) {
+      const nightStart = new Date(Date.now() - (h < c.toHour ? 864e5 : 0));
+      const night = dayText(nightStart);
+      if (mem.balanceNight !== night) { mem.balance = {}; mem.balanceNight = night; }
+      levelAlert(mem.balance, c.label, c, getValue(y, c.key), dayText(new Date()));
+    }
+  }
+  // 3. Yard utilization — re-arms when the value drops 2% below an alerted level
+  mem.util = mem.util || {};
+  (ALERT_CONFIG.utilization || []).forEach(rule => {
+    const v = getNum(y, rule.key);
+    if (!rule.enabled || v === null) return;
+    const passed = rule.thresholds.filter(t => v >= t);
+    const level = passed.length ? Math.max.apply(null, passed) : 0;
+    const before = mem.util[rule.label] || 0;
+    if (level > before) showNotice(rule.title, fillMsg(rule.message, v.toFixed(1), dayText(new Date())), 'util-' + rule.label + '-' + level);
+    mem.util[rule.label] = level > before ? level : (v < before - 2 ? level : before);
+  });
+
+  try { localStorage.setItem(NUMBER_ALERT_MEMORY_KEY, JSON.stringify(mem)); } catch (e) { /* storage blocked */ }
+}
+
+function showNotice(title, body, tag) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if (pushOn() && !/^alerts-/.test(tag)) return;   // push is on: the server sends this alert (no double)
+  const opts = { body: body, tag: tag, requireInteraction: true };
+  const fallback = () => {
+    try {
+      const n = new Notification(title, opts);
+      n.onclick = () => { window.focus(); n.close(); };
+    } catch (e) { console.warn('Notification failed:', e); }
+  };
+  if (swReg && swReg.showNotification) swReg.showNotification(title, opts).catch(fallback);
+  else fallback();
+}
+
+// Time text for vessel alerts: " · ATA Mon 26 Oct, 08:30", or nothing if N4 has no time yet
+function timeOr(label, raw) {
+  return raw ? ' · ' + label + ' ' + formatEta(raw) : '';
+}
+
+function notifyArrival(v) {
+  const verb = v.rank === 40 ? 'has arrived and started work' : 'has arrived';
+  let body = v.name + ' ' + verb + ' at ' + v.berth + timeOr('ATA', v.ata);
+  if (v.rank === 40) body += timeOr('Work start', v.ws);
+  showNotice('Vessel arrived — ' + v.berth, body, 'arrival-' + v.name.toUpperCase());
+}
+
+function notifyWorkStart(v) {
+  showNotice('Work started — ' + v.berth, v.name + ' has started work at ' + v.berth + timeOr('Work start', v.ws), 'workstart-' + v.name.toUpperCase());
+}
+
+function notifyComplete(v) {
+  showNotice('Work completed — ' + v.berth, v.name + ' has completed work at ' + v.berth + timeOr('Work end', v.wc), 'complete-' + v.name.toUpperCase());
+}
+
+function notifyDeparture(v) {
+  showNotice('Vessel departed — ' + v.berth, v.name + ' has left ' + v.berth + timeOr('ATD', v.atd), 'depart-' + v.name.toUpperCase());
+}
+
+// Console test (F12 > Console), uses live data.json + your changes, real alert logic:
+//   testPhase({ PCT2_Status: '30ARRIVED' })   -> arrival alert
+//   testPhase({ PCT2_Status: '50COMPLETE' })  -> completion alert
+//   testPhase({ PCT2_Vessel: '' })            -> departure alert (after the COMPLETE test)
+// Cards are not changed; the next normal refresh puts the real phases back in memory.
+async function testPhase(changes) {
+  const data = await getData();
+  if (!data) return;
+  Object.assign(data.liveYard, changes || {});
+  checkVesselAlerts(data);
+  return loadMemory();
+}
+
+/* ----------------------------------------------------
+   PUSH ALERTS (app / browser closed) — Firebase
+   "Alerts" button: allow notifications → this device is registered with the
+   Apps Script (PushTokens tab). The Apps Script then sends vessel + number alerts.
+   Without Firebase settings the page alerts only while it is open (as before).
+   ---------------------------------------------------- */
+const PUSH_KEY = 'rsgtPushToken';
+function store(key, val) {
+  try { val === null ? localStorage.removeItem(key) : localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* blocked */ }
+}
+function load(key) {
+  try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; }
+}
+function pushConfigured() {
+  return /\/exec$/.test(API_URL) && VAPID_KEY !== 'PASTE' && FIREBASE_CONFIG.apiKey !== 'PASTE';
+}
+function pushSupported() {
+  return pushConfigured() && 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
+}
+function pushOn() {
+  return pushSupported() && Notification.permission === 'granted' && !!load(PUSH_KEY);
+}
+
+async function api(action, body) {
+  const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(Object.assign({ action }, body || {})) });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+let messaging = null;
+function loadScript(src) {
+  return new Promise((ok, fail) => {
+    const el = document.createElement('script');
+    el.src = src; el.onload = ok; el.onerror = fail;
+    document.head.appendChild(el);
+  });
+}
+async function getMessaging() {
+  if (messaging) return messaging;
+  if (!window.firebase) {
+    await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+    await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
+  }
+  if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+  messaging = firebase.messaging();
+  return messaging;
+}
+
+async function registerPush() {
+  const reg = swReg || await navigator.serviceWorker.ready;
+  const m = await getMessaging();
+  const token = await m.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+  if (!token) throw new Error('No push token');
+  const old = load(PUSH_KEY);
+  const s = session();
+  const r = await api('subscribe', { token: s && s.token, fcmToken: token, scope: reg.scope });
+  if (r.error === 'auth') { authLost(); throw new Error('auth'); }
+  if (!r.ok) throw new Error(r.message || r.error || 'subscribe failed');
+  if (old && old !== token) { try { await api('unsubscribe', { fcmToken: old }); } catch (e) { /* ignore */ } }
+  store(PUSH_KEY, token);
+}
+
+// Every app start: keep this device's registration current (tokens can change)
+async function refreshPushToken() {
+  if (!pushSupported() || Notification.permission !== 'granted' || !load(PUSH_KEY)) return;
+  try { await registerPush(); } catch (e) { console.warn('Push refresh:', e); }
+  updateAlertBtn();
+}
+
+function updateAlertBtn() {
+  const btn = document.getElementById('alertBtn');
+  if (!('Notification' in window) || (LOGIN_REQUIRED && !session())) { btn.classList.add('d-none'); return; }   // iPhone Safari before "Add to Home Screen" / signed out
+  btn.classList.remove('d-none', 'on', 'blocked');
+  const p = Notification.permission;
+  if (p === 'granted') {
+    btn.classList.add('on');
+    btn.innerHTML = '<i class="bi bi-bell-fill me-1"></i>Alerts on';
+    btn.title = pushOn()
+      ? 'Alerts are on for this device, also when the app is closed. Click to send a test alert.'
+      : 'Alerts are on while this page is open. Click to send a test alert.';
+  } else if (p === 'denied') {
+    btn.classList.add('blocked');
+    btn.innerHTML = '<i class="bi bi-bell-slash me-1"></i>Alerts blocked';
+    btn.title = 'Notifications are blocked. Allow them in the browser / app settings.';
+  } else {
+    btn.innerHTML = '<i class="bi bi-bell me-1"></i>Alerts';
+    btn.title = 'Get a notification for vessel arrival, work start, completion, departure and booking levels';
+  }
+}
+
+async function enableAlerts() {
+  if (!('Notification' in window)) return;
+  const btn = document.getElementById('alertBtn');
+  btn.disabled = true;
+  try {
+    // already on → test
+    if (Notification.permission === 'granted' && (pushOn() || !pushSupported())) {
+      if (pushOn()) {
+        const s = session();
+        const r = await api('testPush', { token: s && s.token, fcmToken: load(PUSH_KEY) });
+        if (r.error === 'auth') { authLost(); return; }
+        if (!r.ok) alert(r.message || 'Test alert failed.');
+      } else {
+        showNotice('Test alert', 'Alerts are working while this page is open.', 'alerts-test');
+      }
+      return;
+    }
+    const p = Notification.permission === 'default' ? await Notification.requestPermission() : Notification.permission;
+    if (p !== 'granted') return;
+    if (pushSupported()) {
+      await registerPush();
+      showNotice('Alerts on', 'You will get alerts on this device, also when the app is closed.', 'alerts-on');
+    } else {
+      showNotice('Alerts on', 'You will get alerts here while this page is open.', 'alerts-on');
+    }
+  } catch (e) {
+    console.error('Alerts:', e);
+    alert('Could not turn on alerts on this device.');
+  } finally {
+    btn.disabled = false;
+    updateAlertBtn();
+  }
+}
+
+/* ----------------------------------------------------
+   LOGIN + DATA
+   LOGIN_REQUIRED = false → public data.json (no sign-in)
+   LOGIN_REQUIRED = true  → company email + emailed PIN, 30-day login per device;
+                            data comes from the Apps Script (token checked there)
+   ---------------------------------------------------- */
+const SESSION_KEY = 'rsgtSession';      // { token, email, expires }
+const REFRESH_MS = 30000;
+
+function session() {
+  if (!LOGIN_REQUIRED) return { token: '' };
+  const s = load(SESSION_KEY);
+  return s && s.token && s.expires > Date.now() ? s : null;
+}
+
+// Returns the dashboard data (same shape as data.json) or null (→ sign-in screen)
+async function getData() {
+  if (!LOGIN_REQUIRED) {
+    const res = await fetch('/AssignmentData/data.json?cacheBust=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }
+  const s = session();
+  if (!s) { showLogin(); return null; }
+  const r = await api('data', { token: s.token });
+  if (r.error === 'auth') { authLost(); return null; }
+  if (!r.ok || !r.data) throw new Error(r.message || r.error || 'No data');
+  return r.data;
+}
+
+function authLost() {
+  store(SESSION_KEY, null);
+  showLogin('Session ended. Sign in again.');
+}
+
+function setMsg(text, ok) {
+  const el = document.getElementById('loginMsg');
+  el.textContent = text || '';
+  el.className = 'login-msg' + (text ? (ok ? ' ok' : ' err') : '');
+}
+
+function showLogin(message) {
+  document.getElementById('dashView').classList.add('d-none');
+  document.getElementById('controlsBar').classList.add('d-none');
+  document.getElementById('loginView').classList.remove('d-none');
+  document.getElementById('signOutBtn').classList.add('d-none');
+  document.getElementById('loginPin').value = '';
+  setMsg(message || '', false);
+  updateAlertBtn();
+}
+
+function showDashboard() {
+  document.getElementById('loginView').classList.add('d-none');
+  document.getElementById('controlsBar').classList.remove('d-none');
+  document.getElementById('dashView').classList.remove('d-none');
+  document.getElementById('signOutBtn').classList.toggle('d-none', !LOGIN_REQUIRED);
+  updateAlertBtn();
+}
+
+// One step: email + PIN (ACCESS_CODES in the Apps Script) → 30-day login on this device
+async function signIn(ev) {
+  ev.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pin = document.getElementById('loginPin').value.replace(/\D/g, '');
+  if (!email || pin.length !== 6) { setMsg('Enter your email and 6-digit PIN.'); return; }
+  const btn = document.getElementById('signInBtn');
+  btn.disabled = true;
+  setMsg('Signing in…', true);
+  try {
+    const r = await api('verifyPin', { email, pin });
+    if (!r.ok) {
+      setMsg(r.error === 'domain' || r.error === 'expired' ? 'Email or PIN not recognised.' : (r.message || 'Wrong PIN.'));
+      return;
+    }
+    store(SESSION_KEY, { token: r.token, email: r.email, expires: r.expires });
+    setMsg('');
+    showDashboard();
+    loadDashboard();
+    refreshPushToken();   // link this device's alerts to the login
+  } catch (e) {
+    setMsg('No connection. Try again.');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function signOut() {
+  const t = load(PUSH_KEY);
+  if (t) { try { await api('unsubscribe', { fcmToken: t }); } catch (e) { /* offline */ } }
+  store(PUSH_KEY, null);
+  store(SESSION_KEY, null);
+  showLogin('Signed out.');
+}
+
+async function loadDashboard() {
+  try {
+    setSectionDate();
+
+    const data = await getData();
+    if (!data) return;
+
+    if (data.latestTimestamp) {
+      const dt = new Date(data.latestTimestamp);
+      if (!isNaN(dt)) {
+        document.getElementById('lastUpdated').innerText = `${fmtDate(dt)}, ${fmtTime(dt)}`;
+      }
+    }
+
+    document.getElementById('todayKpiRows').innerHTML = renderTodayRows(data, todayList);
+    document.getElementById('tomorrowKpiRows').innerHTML = renderTomorrowRows(data, tomorrowList);
+    document.getElementById('balanceRows').innerHTML = renderBalanceRows(data, balanceList);
+    document.getElementById('berthGrid').innerHTML = renderBerthCards(data, berthList);
+    document.getElementById('utilGrid').innerHTML = renderUtil(data, utilList);
+
+    checkVesselAlerts(data);
+    checkNumberAlerts(data);
+
+  } catch (err) {
+    console.error('Failed to load data:', err);
+  }
+}
+
+if (session()) { showDashboard(); loadDashboard(); } else { showLogin(); }
+setInterval(() => { if (session() && !document.hidden) loadDashboard(); }, REFRESH_MS);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && session()) loadDashboard(); });
+</script>
+</body>
+</html>
