@@ -1229,7 +1229,7 @@ function berthCardHtml(title, vessel, status, times, metrics, isNext, col, prod)
         <div class="berth-metrics${PROD_STYLE === 'C' && hasProd(prod) ? ' bm3' : ''}">
           <div><div class="bm-label">Import Discharged</div><div class="bm-val">${metrics.imp}</div></div>
           <div class="bm-export">
-            <div class="bm-label">Export (Yard)</div><div class="bm-val">${metrics.exp}</div>
+            <div class="bm-label">Export Remaining</div><div class="bm-val">${metrics.exp}</div>
             ${metrics.split ? metrics.split.map(t => `<div class="bm-sub">${t}</div>`).join('') : ''}
             ${metrics.pct !== null ? `<div class="bm-bar"><span style="width:${Math.min(100, metrics.pct)}%"></span></div>
             <div class="bm-pct">${metrics.pct}% in yard (${metrics.exp} / ${metrics.total})</div>` : ''}
