@@ -1450,7 +1450,7 @@ function checkVesselAlerts(data) {
     berthList.forEach(b => {
       const name = getText(y, b.key + '_Last_Vessel');
       if (!name || names[name.toUpperCase()]) return;
-      if (seeded) notifyDeparture({ name: name, berth: b.berth, atd: getText(y, b.key + '_Last_ATD') });
+      if (seeded) notifyDeparture({ name: name, atd: getText(y, b.key + '_Last_ATD') });
       names[name.toUpperCase()] = now;
     });
     Object.keys(names).forEach(k => { if (now - names[k] > MEMORY_KEEP_MS) delete names[k]; });
@@ -1520,7 +1520,7 @@ const ALERT_CONFIG = {
     vesselBelow: 20,   // vessel production below this → alert
     craneBelow: 20,    // gross moves per hour of one crane below this → alert
     minHours: 1,
-    vesselTitle: 'Low vessel production — {berth}',
+    vesselTitle: 'Low vessel production —',
     vesselMessage: '{vessel} vessel production is {value} ({shift}) as of {time}',
     craneTitle: 'Low crane GMPH — {berth}',
     craneMessage: '{crane} on {vessel}: {value} moves per hour ({shift}) as of {time}'
