@@ -1,35 +1,4 @@
 <!DOCTYPE html>
-<!--
-=====================================================================================
-  FILE MAP — Delivery Detail and Berth Information (one file: HTML + CSS + JavaScript)
-  Search (Ctrl+F) for the words in CAPITALS to jump to a part.
--------------------------------------------------------------------------------------
-  1. <head>      page title, app icons (manifest.json), fonts / icon libraries
-  2. <style>     LOOK of the page (colours, sizes, spacing). Each block starts with a comment:
-                   SECTION COLOURS · GATE CARD · CRANE TREND · LAST VESSEL pop-up · "?" help buttons
-                 Colour codes look like #002b49 (navy) · #118ACB (blue) · #008E73 (green) · #E07B00 (orange)
-  3. <body>      the BOXES you see, top to bottom (each starts with an HTML comment):
-                   TOP NAV HEADER · GREETING · CONTROL BAR · LOGIN · SECTION 1-3 TODAY / TOMORROW / BALANCE
-                   SECTION 4 BERTH STATUS · SECTION 5 YARD UTILIZATION · SECTION 6 GATE
-                 Most boxes are empty here and filled by the JavaScript (look for id="…").
-  4. <script>    what the page DOES:
-                   APP SETTINGS (login switch, Apps Script URL, Firebase keys — do not change)
-                   todayList / tomorrowList / balanceList  → rows and labels of the delivery cards
-                   BERTH PRODUCTION · GATE · CRANE TREND · LAST COMPLETED VESSEL · HELP / GLOSSARY
-                   YARD UTILIZATION · VESSEL ALERTS · NUMBER ALERTS · PUSH ALERTS · LOGIN + DATA · FORCE REFRESH
--------------------------------------------------------------------------------------
-  QUICK CHANGES (all are "const NAME = value;" lines inside <script>)
-    SHOW_GATE / SHOW_LAST_VESSEL / SHOW_CV_FORECAST / SHOW_HELP   true = show · false = hide
-    GLOSSARY            text of every "?" explanation
-    todayList …         label: 'CV' = row name on the card
-    GMPH_LEVELS         red / amber / green limits of the crane chips
-    UTIL_LEVELS         70 % / 85 % yard rings
-    ALERT_CONFIG        alert levels and alert wording (keep the same as in the Apps Script)
-    TREND_COLORS        colour of each crane line
-  Body colour theme: <body class="theme-color"> = section colours · <body> = classic navy.
-  Rule: change one thing, save, open the page, check, then change the next thing.
-=====================================================================================
--->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
