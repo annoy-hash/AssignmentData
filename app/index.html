@@ -1330,7 +1330,7 @@ function openGateTrend() {
   el.innerHTML = `<div class="trend-card" style="width:min(800px,100%)"><div class="trend-head"><div><b>Terminal &amp; customs time — last 8 hours${help('done')}</b>
     <small>Average minutes of trucks gated out in the last 3 h, at each update</small></div>
     <button type="button" class="trend-x" onclick="closeTrend()" aria-label="Close">&times;</button></div>
-    <div class="trend-body"><div class="gt-leg"><span><i style="background:${GATE_LINE.terminal}"></i>Terminal time (gate in → handled)</span><span><i style="background:${GATE_LINE.custom}"></i>Import customs time (handled → gate out)</span></div>
+    <div class="trend-body"><div class="gt-leg"><span><i style="background:${GATE_LINE.terminal}"></i>Terminal time (gate in → handled)</span><span><i style="background:${GATE_LINE.custom}"></i>Customs time (handled → gate out)</span></div>
     ${gateChart(gt)}</div></div>`;
   document.body.appendChild(el);
 }
